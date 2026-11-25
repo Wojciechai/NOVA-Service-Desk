@@ -1,98 +1,80 @@
 # NOVA Service Desk
 
-**Offline helpdesk training simulator** · Version **0.2.0** · Local-first / personal learning project
+**Offline helpdesk training simulator** | Version **0.5.1** | Windows / modern browser | Polish UI
 
-NOVA Service Desk is a fictional IT support environment for practicing helpdesk workflows: troubleshooting, customer communication, incident prioritization, remote-support consent, documentation, and safe escalation.
+A local-first practice environment built around a fictional company. NOVA lets trainees work through incident reports, communicate with returning customers, troubleshoot fictional PCs, document outcomes, and learn how to prioritize cases under time pressure.
 
-> **Status:** Early prototype. This is **not** a real remote-access tool, an operating system, or a replacement for supervised practice in a company. All incidents and customer conversations are simulated.
+> **Training simulation, not real IT infrastructure.** NOVA Remote Assist cannot see, access or control real computers. Its Windows-like desktop, console, people, networks and application states are simulated. There is no live AI conversation, server connection or TeamViewer integration.
 
-## Features in v0.2.0
+## Run locally
 
-- **Incident dashboard** with a queue, priority labels (P1–P3), and persistent case state.
-- **Virtual work calendar**: manually advance simulated days; previously opened incidents remain in the backlog.
-- **Recurring customers** with follow-up problems across different days.
-- **Special incidents** such as a department-wide VPN outage and a suspected phishing/malware event, unlocked by level.
-- **Progression system:** XP, levels, penalties for unsafe actions, and a completion history. Complex cases award more XP.
-- **NOVA Remote Assist (simulation):** guide the customer through starting an approved tool, obtaining a fictional session code, granting consent, choosing a simulated application, performing actions, and ending the session.
-- **Basic simulated CMD** commands and actions that modify each case's fictional state.
-- **Case notes and verification** before closing an incident.
-- **Offline storage**, plus JSON export/import of progress.
-- **Knowledge base** with introductory IT support procedures.
+1. Open `NOVA_Service_Desk.html` in Chrome, Edge or Opera GX (double-click the file).
+2. Pick a case in **Centrum zgłoszeń**. For a remote-support case, follow the instruction → session code → customer consent procedure.
+3. Diagnose via **Diagnostyka**, **Działania** and the simulated **Zdalny pulpit**. Open program windows, change fictional settings and observe results.
+4. Verify the solution, end remote access when active, write a technical note of 25+ characters and close the ticket.
+5. Use **Kalendarz**, **Postępy** and **Dane i ustawienia** to track work, configure auto-pause and export a JSON backup.
 
-## Quick start / Jak uruchomić
+**Requirements:** current desktop browser, no installation, virtual machine, internet, account, Node.js, API key or permissions needed for the application. Node.js is optional for automated state-machine tests.
 
-1. Download `NOVA_Service_Desk_v0.2.html`.
-2. Open it in a modern browser (Chrome, Edge, or Opera) on your computer.
-3. Select a ticket in **Centrum zgłoszeń**, then use the chat, diagnostics, actions, or remote simulation.
-4. Complete all required steps, add a service note (at least 25 characters), and close the ticket to earn XP.
-5. Open **Kalendarz** and select **Rozpocznij następny dzień** to add new tickets.
-6. In **Dane i ustawienia**, periodically export a JSON backup.
+## Features
 
-**No installation, server, account, internet connection, virtual machine, or paid API is needed.**
-
-## Learning model
-
-| Component | How it works |
+| Area | Available now |
 | --- | --- |
-| Virtual days | The user manually advances the calendar; this is not a real-time background scheduler. |
-| Case library | 12 authored cases across the first 10 days. After day 10, templates rotate to create additional tickets; they are not all unique cases. |
-| Recurring staff | The same fictional employees return with new or related support requests. |
-| XP | Awarded **once per ticket ID** after the mandatory checks and a service note; reset cannot be used to farm XP. |
-| Difficulty | P1 and later-day tickets yield more XP; some special tickets require level 2 or 3. |
-| Mistakes | A deliberately unsafe configuration change is logged and reduces the ticket's XP reward. |
-| Remote support | Choice-driven simulation only. No real screen capture, control, or TeamViewer connection. |
+| Tickets | Priorities P1–P3, written diagnostics, persistent history, SLA indicators, carry-over and customer history |
+| Calendar | A simulated workday lasts **24 real minutes** while the app is active; manual pause and optional auto-pause when you Alt+Tab |
+| Daily workflow | Unfinished cases automatically roll into the next simulated day with notes, status and checks intact |
+| Interruptions | A scheduled urgent incident arrives halfway through every third simulated day from day 3 onwards; existing templates are reused |
+| Customers | Fictional repeat customers, 12 originally authored cases, additional rotating templates after day 10 |
+| Remote Assist | Fictional approval procedure, simulated Windows-like client desktop, selectable apps, configurable DNS, proxy, Outlook, devices, printer and startup |
+| Tools | Simulated CMD commands including `ipconfig /all`, `ping`, `nslookup`, `tasklist` and `ipconfig /renew` |
+| Mistakes | Changes can cause additional fictional faults, be corrected, block verification until fixed and reduce XP |
+| Progress | XP, trainee levels, skill categories, achievements, shift reports, training/realistic mode |
+| Backup | Browser `localStorage` plus JSON export/import; a v0.2 save can be read in later versions if accessible under the same browser origin |
 
-## Ticket scenarios
+### Timing and backlog
 
-- Incorrect corporate DNS configuration
-- Locked employee account
-- Outlook in offline mode
-- Blocked printer queue
-- Wrong device selected in Microsoft Teams
-- APIPA / unavailable DHCP lease
-- **Special:** widespread VPN outage
-- Resource-heavy Windows startup application
-- Full mailbox
-- **Special:** suspicious email attachment / security escalation
-- Follow-up printer incident
-- Follow-up Teams device issue
+A shift is 24 minutes of **active use**, not 24 minutes while the computer is idle. Use **Pauza** whenever needed. Auto-pause on window focus loss is on by default; the timer resumes upon return unless a manual pause is still active. Closing the application does not spend your time. When the timer reaches zero, the next day starts automatically. Open items carry across; their histories and notes remain, and overdue tickets are distinguished from merely carried-forward tickets. The P1/P2/P3 windows here are **fictional training rules**, not real employer SLAs. The calendar currently advances through consecutive dates including weekends.
 
-## Technology
+### Learning limits
 
-- HTML5, CSS3, vanilla JavaScript (single offline `.html` file).
-- `localStorage` for progress on the local browser profile.
-- JSON export/import for backup and transfer.
-- No external libraries or services.
+- Remote desktop applications are **implemented models**, not a complete Windows clone. Unsupported Windows functions will not work; the interface must not be confused with an actual VM.
+- Chats use rule-driven fictional answers, not an online language model.
+- The first 10 virtual days have 12 manually designed cases; later days reuse case templates. Emergency tickets are scheduled, not randomly generated.
+- XP measures simulator performance only; it is **not** a claim of commercial Helpdesk experience or certification.
+- Data is stored locally. Under `file://`, some browsers isolate `localStorage` by file path or origin. **Export a JSON backup before opening a new version or moving the file.** Importing overwrites current progress after confirmation.
 
-## Data & safety
+## Project layout
 
-- The application does **not** run system commands or change real Windows settings.
-- Remote Assist **does not** connect to other devices. The session code displayed by the app is fictional.
-- The environment contains fictional company users and incidents only.
-- Browser-stored progress can be lost if you clear site data or if the browser treats a moved `file://` document as a different origin. Use the JSON backup tool.
-- Import overwrites the current simulator progress after confirmation. Only import trusted backup files.
+```text
+NOVA_Service_Desk.html     # Entire offline app (HTML + CSS + vanilla JS)
+README.md                  # Getting started, features, limitations
+CHANGELOG.md               # Real releases and actual fixes
+TESTS.md                   # Verification performed vs. still pending
+GITHUB_PUBLISHING.md       # How to publish with GitHub Desktop
+ROADMAP.md                 # Future ideas (VM mode not implemented)
+scripts/                   # Node.js state-machine regression tests
+```
 
-## Upgrading from v0.1
+## Test commands (optional)
 
-On startup v0.2 attempts to import the three original ticket states from the browser's `nova-helpdesk-v01` localStorage key if it is accessible under the same origin. Browsers can isolate storage for individual local files, so **automatic migration is not guaranteed**. The v0.1 file remains untouched.
+```bash
+node scripts/regression.js NOVA_Service_Desk.html
+node scripts/scenario-checks.js NOVA_Service_Desk.html
+node scripts/hotfix-checks.js NOVA_Service_Desk.html
+```
 
-## Roadmap
+Tests execute the embedded JavaScript with an in-memory DOM/storage stub, so they validate application state transitions but do **not** replace a real-browser manual test. The JavaScript syntax was also checked with `node --check` for each staged release. See `TESTS.md`.
 
-- [x] First incident queue and guided troubleshooting (v0.1)
-- [x] Daily calendar, repeat clients, specials, XP and simple Remote Assist (v0.2)
-- [ ] More varied customer conversations and case branching
-- [ ] A richer interactive fictional Windows desktop and more persistent fault states
-- [ ] Ticket search, filters, SLA timing, and individual customer histories
-- [ ] Scenario editor and difficulty tuning
-- [ ] Automated regression tests and performance benchmarks in CI
-- [ ] Optional VM integration as a future, separate feature
+## GitHub release history
 
-## Changelog
+This folder contains a **real local Git repository with five commits and five version tags**: `v0.2.0`, `v0.3.0`, `v0.4.0`, `v0.5.0` and `v0.5.1`. It can be published as a private repository using GitHub Desktop. These tags describe actual files built in this handoff and do not imply an earlier public release or outside user feedback. See [GITHUB_PUBLISHING.md](GITHUB_PUBLISHING.md) for the exact click sequence.
 
-See [`CHANGELOG.md`](CHANGELOG.md) for released changes, fixes and optimization notes.
+## Safety and privacy
 
-## Author & project status
+No external requests, telemetry, user-account credentials, network scans, real device administration, remote access or privilege elevation. Fictional session codes must never be mistaken for real remote-support credentials. Never import a backup you do not trust; JSON import is designed for local data. The program does not run shell commands on Windows.
 
-Personal learning and portfolio project by [Wojciech Żydek](https://github.com/Wojciechai). Currently developed privately. No public hosted demo or repository URL is asserted here.
+## Author and project status
 
-**License:** Not selected. Do not assume the code is open-source unless a license is added.
+Portfolio project by [Wojciech Żydek](https://github.com/Wojciechai), built collaboratively with ChatGPT. The release history is locally prepared for review and publication; it has not been pushed to GitHub automatically.
+
+**License:** Not selected; the suggested first repository is private. No open-source license is claimed. Choose a license explicitly if you later want to grant public reuse rights.
