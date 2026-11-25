@@ -1,85 +1,96 @@
 # Changelog — NOVA Service Desk
 
-Project versions follow `MAJOR.MINOR.PATCH`: features increase MINOR; actual verified fixes increase PATCH. Entries below refer to generated local release snapshots, not fabricated public downloads or user bug reports. Dates represent build dates.
+All notable **application changes** are recorded here, with newest versions first. NOVA uses `MAJOR.MINOR.PATCH` versioning: feature releases advance the minor version, while verified bug fixes advance the patch version.
 
-## [Unreleased] — Repository maintenance (2026-11-25)
+Dates refer to when the development versions were prepared. The v0.3.0, v0.4.0 and v0.5.0 entries describe actual development stages that were subsequently combined into the current v0.5.1 application; they are **not separate public GitHub releases**.
 
-### Changed
-- Removed the outdated GitHub Desktop publishing guide from the main branch after direct repository publication.
-- Removed the old v0.2 ZIP archive from the repository root; previous commits still retain it.
-- Updated README setup instructions, repository layout, public visibility and release-history wording to match the live GitHub repository.
-- Kept `.gitignore` and executable regression checks as standard repository-maintenance files.
-- No application code or runtime behavior changed during this housekeeping update.
-
-## [0.5.1] — 2026-11-25 (Hotfix)
+## [0.5.1] — 2026-11-25 — Bug fixes / Hotfix
 
 ### Fixed
-- Corrected responsive remote-desktop window layout and taskbar wrapping, which inherited incompatible grid styling.
-- Corrected inconsistent emergency-ticket title on reload/import by rebuilding it from a trusted template.
-- Fixed a dead-end where a wrong action could block verification permanently in mass VPN and security incidents with no repair action.
-- Allowed correction of an accidentally misconfigured DNS through the interactive remote settings to clear the corresponding fault state.
-- Fixed visible-time undercount when a browser throttles interval execution beyond five seconds. The clock now accounts for up to two minutes of a delayed visible tick.
+- **Remote desktop UI:** corrected window layout and taskbar wrapping caused by conflicting grid and flex styles.
+- **Emergency ticket persistence:** restored the correct incident title after loading or importing a saved game, instead of trusting an inconsistent stored title.
+- **VPN and security cases:** prevented incorrect actions from permanently blocking successful verification when the scenario had no separate repair step.
+- **DNS recovery:** made it possible to reverse an incorrect DNS setting using the simulated remote desktop and clear the associated fault.
+- **Workday timer:** corrected lost simulated time when the browser delayed a visible timer callback; the timer now compensates for delayed ticks of up to two minutes.
 
-### Verified
-- Added targeted state-machine tests for the actual fixes; all five targeted checks passed.
-- All original 12 training scenarios are completable; general workflow tests passed.
+### Verification
+- Targeted regression checks covered all five fixes.
+- All 12 original incident workflows remained completable in simulated state tests.
 
-## [0.5.0] — 2026-11-25 (Features)
-
-### Added
-- Skill progression in Windows, Networking, Microsoft 365, Customer Support and Security.
-- Achievement badges based on completed simulated cases.
-- Progress dashboard showing completed/open/carried/overdue counts and recent shift reports.
-- Training mode toggle for showing/hiding required workflow steps.
-- Per-customer visit/resolution counts on ticket details.
-
-### Maintenance
-- Hardened dynamic incident imports by rebuilding known emergency cases from trusted templates.
-- Extended save import with workday carry counts, scenario types, priorities and XP mistake metadata.
-
-## [0.4.0] — 2026-11-25 (Features)
+## [0.5.0] — 2026-11-25 — Skills and progression
 
 ### Added
-- 24-real-minute simulated workday with an on-screen countdown.
-- Manual Pause/Resume and automatic pause on Alt+Tab/window focus loss (configurable).
-- Automatic roll-over of unresolved cases into the next day, preserving progress, notes, conversation history and status.
-- Carry-over counters and fictional SLA-overdue labels.
-- End-of-shift history and optional early shift completion.
-- A deterministic urgent interruption halfway through every third day from day 3.
-- Clock, events and history included in progress backup data.
+- Five skill categories: **Windows, Networking, Microsoft 365, Customer Support and Security**.
+- Achievement badges for completed training scenarios.
+- A progress dashboard with resolved, open, carried-over and overdue ticket totals.
+- Shift summaries and recent workday history in the progress view.
+- A training-mode option to show or hide workflow guidance.
+- Customer-specific visit and resolution counts on ticket details.
 
-### Notes
-- The timer stops outside the open app and does not use a remote/background scheduler.
-- Emergency incidents reuse existing cases, not a new unlimited story generator.
+### Improved
+- Expanded saved-ticket data to retain priority, scenario type, carry-over count and mistake-penalty information when importing progress.
+- Normalized known emergency incidents against built-in scenario definitions during save import.
 
-## [0.3.0] — 2026-11-25 (Features)
+## [0.4.0] — 2026-11-25 — Workday simulation
 
 ### Added
-- Interactive *fictional* Windows desktop in NOVA Remote Assist, launched only after consent.
-- Clickable desktop/taskbar programs: settings/network, simulated CMD, company app/Outlook/Teams, devices/printers, Task Manager and Explorer.
-- Stateful fictional device settings (e.g. DNS, DHCP, proxy, Outlook offline, printer queue, audio device, startup app).
-- Repair choices, incorrect choices with consequences, console output reflecting device state, and verification guards.
-- Existing v0.2 remote-session safety checks and incident flow retained.
+- A **24-minute real-time workday** with a visible countdown.
+- Manual **Pause / Resume** for the workday timer.
+- Optional automatic pause when the NOVA window loses focus (e.g. Alt+Tab), with automatic resume on return unless manually paused.
+- Automatic transition to the next simulated day when time expires.
+- Automatic carry-over of all unresolved tickets **without resetting notes, conversation history, checks or ticket status**.
+- A carried-over ticket counter, separate from fictional SLA-overdue status.
+- End-of-shift summaries and an option to finish a shift early.
+- A scheduled urgent incident halfway through every third day, starting on day 3.
+- Storage of timer, emergency-event and shift-history information in JSON backups.
 
-### Maintenance
-- Normalized missing device/remote fields in saved v0.2 ticket data without deleting XP or notes.
+### Behavior notes
+- The timer only advances during an active unpaused session; closing the app does not consume shift time.
+- Urgent cases come from predefined templates rather than an unrestricted random scenario generator.
 
-## [0.2.0] — 2026-11-24 (Existing baseline)
+## [0.3.0] — 2026-11-25 — Interactive remote assistance
 
-- Calendar with manual day advance, 12 authored incidents over 10 days, recurring fictional employees and special P1 cases.
-- XP, levels, simulated remote-support choices, knowledge base and JSON backup.
-- Prior improvements to ticket validation, legacy v0.1 import and no-repeat XP awards.
-- The v0.2.0 baseline is retained in Git history; the public repository also contains earlier upload commits.
+### Added
+- An interactive **fictional Windows-style customer desktop** inside NOVA Remote Assist.
+- A customer-guidance, connection-code and consent workflow before remote control becomes available.
+- Clickable simulated application windows for network settings, CMD, Outlook/Teams or company apps, printer/devices, Task Manager and File Explorer.
+- Stateful simulated settings for DNS, DHCP, proxy, Outlook offline mode, print queue, audio devices and startup applications.
+- Diagnostic command output that responds to the simulated customer-computer state.
+- Incorrect configuration choices, simulated side effects, repair actions and verification conditions.
 
-## [0.1.0] — 2026-11-24 (Earlier prototype)
+### Improved
+- Preserved the existing remote-session closure and incident-resolution requirements.
+- Added defaults for missing virtual-desktop and remote-session fields when opening older v0.2 saves.
 
-- Three basic tickets, chat, simulated CMD, diagnostics and local browser persistence.
-- This version is documented for completeness but not one of the five prepared publishing commits.
+## [0.2.0] — 2026-11-24 — Ticket workflow expansion
 
-## Fix tracking policy
+### Added
+- A virtual work calendar with manually advanced days and a persistent backlog.
+- **12 authored incidents across 10 simulated days**, including repeat customers and complex cases.
+- More demanding VPN outage and suspicious-attachment scenarios.
+- Priority levels, an incident history, XP rewards, trainee levels and mistake penalties.
+- A choice-driven early version of NOVA Remote Assist with fictional session setup and consent.
+- JSON progress export/import and continued browser-local save support.
+- Reused case templates after day 10, with the scenarios identified as repetitions.
 
-An issue becomes a **hotfix** only when an actual defect is identified and corrected. Preventive hardening, refactoring and performance work are documented as maintenance/optimization rather than made-up incidents. The `v0.5.1` entries above are identified reproducible issues found during development review; they were not attributed to real users.
+### Improved
+- Ticket validation and safeguards against awarding XP multiple times for the same resolved case.
+- Compatibility with older v0.1 save data.
 
-## GitHub history note
+## [0.1.0] — 2026-11-24 — Initial prototype
 
-The connected GitHub integration published the consolidated **v0.5.1 application** as one feature commit. Earlier v0.3.0, v0.4.0 and v0.5.0 versions are documented development stages, not separate commits on the public branch. Subsequent docs, tests and maintenance changes have their own commits. The existing repository history was not rewritten.
+### Added
+- Basic offline helpdesk dashboard with three initial tickets.
+- Scripted customer conversations and technical diagnostic actions.
+- Simulated CMD responses and incident-resolution flow.
+- Browser-local progress persistence.
+
+---
+
+## Testing and release notes
+
+The checks documented in [TESTS.md](TESTS.md) use a stubbed DOM and local storage. They validate selected state transitions, **not** every visual interaction in a real Windows browser. Full manual browser testing remains outstanding.
+
+Only reproducible, corrected defects are labeled **Fixed / Hotfix**. Preventive improvements are marked **Improved**; no fake bug reports or fixes are included.
+
+Repository-only housekeeping (such as README edits, removed upload instructions or GitHub file organization) is tracked in **Git commits**, not treated as an application release.
