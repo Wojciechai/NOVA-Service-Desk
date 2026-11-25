@@ -2,6 +2,15 @@
 
 Project versions follow `MAJOR.MINOR.PATCH`: features increase MINOR; actual verified fixes increase PATCH. Entries below refer to generated local release snapshots, not fabricated public downloads or user bug reports. Dates represent build dates.
 
+## [Unreleased] — Repository maintenance (2026-11-25)
+
+### Changed
+- Removed the outdated GitHub Desktop publishing guide from the main branch after direct repository publication.
+- Removed the old v0.2 ZIP archive from the repository root; previous commits still retain it.
+- Updated README setup instructions, repository layout, public visibility and release-history wording to match the live GitHub repository.
+- Kept `.gitignore` and executable regression checks as standard repository-maintenance files.
+- No application code or runtime behavior changed during this housekeeping update.
+
 ## [0.5.1] — 2026-11-25 (Hotfix)
 
 ### Fixed
@@ -60,7 +69,7 @@ Project versions follow `MAJOR.MINOR.PATCH`: features increase MINOR; actual ver
 - Calendar with manual day advance, 12 authored incidents over 10 days, recurring fictional employees and special P1 cases.
 - XP, levels, simulated remote-support choices, knowledge base and JSON backup.
 - Prior improvements to ticket validation, legacy v0.1 import and no-repeat XP awards.
-- Existing original baseline retained as the first commit.
+- The v0.2.0 baseline is retained in Git history; the public repository also contains earlier upload commits.
 
 ## [0.1.0] — 2026-11-24 (Earlier prototype)
 
@@ -70,6 +79,7 @@ Project versions follow `MAJOR.MINOR.PATCH`: features increase MINOR; actual ver
 ## Fix tracking policy
 
 An issue becomes a **hotfix** only when an actual defect is identified and corrected. Preventive hardening, refactoring and performance work are documented as maintenance/optimization rather than made-up incidents. The `v0.5.1` entries above are identified reproducible issues found during development review; they were not attributed to real users.
-## GitHub publication note — 2026-11-25
 
-The initial public GitHub repository already contained v0.2.0 files and its own commit history. The connected integration added the **combined v0.5.1 application** in one real `feat(simulation)` commit, followed by separate documentation, regression-test and changelog commits. Earlier v0.3.0/v0.4.0/v0.5.0 feature phases are documented from the locally prepared release snapshots; they are **not** represented as individual commits on the public GitHub branch. No prior Git history was rewritten.
+## GitHub history note
+
+The connected GitHub integration published the consolidated **v0.5.1 application** as one feature commit. Earlier v0.3.0, v0.4.0 and v0.5.0 versions are documented development stages, not separate commits on the public branch. Subsequent docs, tests and maintenance changes have their own commits. The existing repository history was not rewritten.
