@@ -1,61 +1,71 @@
 # NOVA Service Desk
 
-**Offline helpdesk training simulator** | Version **0.5.1** | Windows / modern browser | Polish UI
+**Offline IT Helpdesk training simulator** · **v0.5.1** · HTML / CSS / JavaScript · Polish interface
 
-A local-first practice environment built around a fictional company. NOVA lets trainees work through incident reports, communicate with returning customers, troubleshoot fictional PCs, document outcomes, and learn how to prioritize cases under time pressure.
+NOVA Service Desk is a personal portfolio and learning project that simulates day-to-day work in a fictional IT support department. It combines incident tickets, customer conversations, a mock remote-support desktop, a timed shift and skill progression.
 
-> **Training simulation, not real IT infrastructure.** NOVA Remote Assist cannot see, access or control real computers. Its Windows-like desktop, console, people, networks and application states are simulated. There is no live AI conversation, server connection or TeamViewer integration.
+> **This is a simulation, not remote-access software.** NOVA does not connect to real computers, administer Windows, or use TeamViewer. Incidents, users, devices and tool outputs are fictional.
 
-## Run locally
+## Getting started
 
-1. Open `NOVA_Service_Desk.html` in Chrome, Edge or Opera GX (double-click the file).
-2. Pick a case in **Centrum zgłoszeń**. For a remote-support case, follow the instruction → session code → customer consent procedure.
-3. Diagnose via **Diagnostyka**, **Działania** and the simulated **Zdalny pulpit**. Open program windows, change fictional settings and observe results.
-4. Verify the solution, end remote access when active, write a technical note of 25+ characters and close the ticket.
-5. Use **Kalendarz**, **Postępy** and **Dane i ustawienia** to track work, configure auto-pause and export a JSON backup.
+1. Download [`NOVA_Service_Desk.html`](NOVA_Service_Desk.html) using **Download raw file** on GitHub, or clone the repository.
+2. Open the HTML file in a modern desktop browser (Chrome, Edge or Opera GX).
+3. Select an incident, investigate it, perform the simulated actions and document the result.
+4. For remote-support cases, complete the customer guidance, session code and consent steps before opening the simulated desktop.
+5. Verify the fix, end an active remote session and close the case with a technical note.
 
-**Requirements:** current desktop browser, no installation, virtual machine, internet, account, Node.js, API key or permissions needed for the application. Node.js is optional for automated state-machine tests.
+The application runs locally **without installation, server, virtual machine, API key or internet connection**. Node.js is only needed for optional regression tests.
 
-## Features
+## Current features
 
-| Area | Available now |
+| Area | What you can practice |
 | --- | --- |
-| Tickets | Priorities P1–P3, written diagnostics, persistent history, SLA indicators, carry-over and customer history |
-| Calendar | A simulated workday lasts **24 real minutes** while the app is active; manual pause and optional auto-pause when you Alt+Tab |
-| Daily workflow | Unfinished cases automatically roll into the next simulated day with notes, status and checks intact |
-| Interruptions | A scheduled urgent incident arrives halfway through every third simulated day from day 3 onwards; existing templates are reused |
-| Customers | Fictional repeat customers, 12 originally authored cases, additional rotating templates after day 10 |
-| Remote Assist | Fictional approval procedure, simulated Windows-like client desktop, selectable apps, configurable DNS, proxy, Outlook, devices, printer and startup |
-| Tools | Simulated CMD commands including `ipconfig /all`, `ping`, `nslookup`, `tasklist` and `ipconfig /renew` |
-| Mistakes | Changes can cause additional fictional faults, be corrected, block verification until fixed and reduce XP |
-| Progress | XP, trainee levels, skill categories, achievements, shift reports, training/realistic mode |
-| Backup | Browser `localStorage` plus JSON export/import; a v0.2 save can be read in later versions if accessible under the same browser origin |
+| Ticket management | Priorities, troubleshooting, case notes, verification, customer history and fictional SLA indicators |
+| Remote assistance | A consent-based, simulated remote session with a clickable Windows-like desktop |
+| Troubleshooting | Fictional network, DNS, DHCP, Outlook, printer, device and process problems |
+| Diagnostic tools | Simulated commands such as `ipconfig /all`, `ping`, `nslookup` and `tasklist` |
+| Decisions and mistakes | Changing virtual device settings, creating additional faults and recovering from incorrect actions |
+| Work calendar | A 24-minute active-use shift, manual pause, optional auto-pause on Alt+Tab, and shift summaries |
+| Backlog and interruptions | Automatic carry-over of unfinished tickets, recurring clients and scheduled urgent incidents |
+| Progression | XP, levels, skill categories, achievements and optional training hints |
+| Saving progress | Browser `localStorage`, JSON backup export and import |
 
-### Timing and backlog
+### Workday rules
 
-A shift is 24 minutes of **active use**, not 24 minutes while the computer is idle. Use **Pauza** whenever needed. Auto-pause on window focus loss is on by default; the timer resumes upon return unless a manual pause is still active. Closing the application does not spend your time. When the timer reaches zero, the next day starts automatically. Open items carry across; their histories and notes remain, and overdue tickets are distinguished from merely carried-forward tickets. The P1/P2/P3 windows here are **fictional training rules**, not real employer SLAs. The calendar currently advances through consecutive dates including weekends.
+A simulated shift lasts **24 real minutes** while NOVA is active. The timer can be paused manually and, by default, pauses when the application loses focus. On return, it resumes unless manual pause remains enabled.
 
-### Learning limits
+When a shift ends, unfinished tickets move to the next simulated day **with their notes, status and completed checks preserved**. Carried-over cases are not automatically considered overdue; SLA violations use separate fictional training rules. The current calendar uses consecutive dates, including weekends.
 
-- Remote desktop applications are **implemented models**, not a complete Windows clone. Unsupported Windows functions will not work; the interface must not be confused with an actual VM.
-- Chats use rule-driven fictional answers, not an online language model.
-- The first 10 virtual days have 12 manually designed cases; later days reuse case templates. Emergency tickets are scheduled, not randomly generated.
-- XP measures simulator performance only; it is **not** a claim of commercial Helpdesk experience or certification.
-- Data is stored locally. Under `file://`, some browsers isolate `localStorage` by file path or origin. **Export a JSON backup before opening a new version or moving the file.** Importing overwrites current progress after confirmation.
+### Scenarios and limitations
 
-## Project layout
+- The first 10 simulated days include **12 authored cases**. Additional days rotate existing case templates rather than generating unlimited new problems.
+- Urgent interruptions are scheduled using predefined scenarios; they are not live events.
+- The virtual desktop and CMD support **implemented actions only**. They are not a complete Windows installation.
+- Customer chat is rule-driven, not connected to an AI service.
+- XP represents **in-game progress**, not commercial experience, certification or independently verified proficiency.
+- No real computer settings, accounts or remote sessions are changed.
+
+## Saving and upgrading
+
+Progress is stored locally in the browser. With `file://` pages, storage access can differ between browsers or file locations.
+
+**Before moving the HTML file or upgrading from an older copy, export your progress as JSON.** After opening the new version, import the backup and confirm that your progress was restored. Keep the original backup until checked.
+
+## Repository structure
 
 ```text
-NOVA_Service_Desk.html     # Entire offline app (HTML + CSS + vanilla JS)
-README.md                  # Getting started, features, limitations
-CHANGELOG.md               # Real releases and actual fixes
-TESTS.md                   # Verification performed vs. still pending
-GITHUB_PUBLISHING.md       # How to publish with GitHub Desktop
-ROADMAP.md                 # Future ideas (VM mode not implemented)
-scripts/                   # Node.js state-machine regression tests
+NOVA_Service_Desk.html   # Offline application
+README.md                # Overview and setup
+CHANGELOG.md             # Changes and verified fixes
+ROADMAP.md               # Planned improvements
+TESTS.md                 # Test results and known gaps
+scripts/                 # Optional Node.js regression checks
+.gitignore               # Local files Git should not track
 ```
 
-## Test commands (optional)
+## Testing
+
+Optional automated checks:
 
 ```bash
 node scripts/regression.js NOVA_Service_Desk.html
@@ -63,18 +73,20 @@ node scripts/scenario-checks.js NOVA_Service_Desk.html
 node scripts/hotfix-checks.js NOVA_Service_Desk.html
 ```
 
-Tests execute the embedded JavaScript with an in-memory DOM/storage stub, so they validate application state transitions but do **not** replace a real-browser manual test. The JavaScript syntax was also checked with `node --check` for each staged release. See `TESTS.md`.
+These scripts exercise selected application states with a **stubbed browser environment**. They do not replace a full end-to-end test in a real browser. See [TESTS.md](TESTS.md) for recorded checks and outstanding manual validation.
 
-## GitHub release history
+## Version history and future plans
 
-This folder contains a **real local Git repository with five commits and five version tags**: `v0.2.0`, `v0.3.0`, `v0.4.0`, `v0.5.0` and `v0.5.1`. It can be published as a private repository using GitHub Desktop. These tags describe actual files built in this handoff and do not imply an earlier public release or outside user feedback. See [GITHUB_PUBLISHING.md](GITHUB_PUBLISHING.md) for the exact click sequence.
+- **v0.2.0:** ticket system, simulated calendar, clients and initial Remote Assist.
+- **v0.3.0–v0.5.0:** interactive desktop, 24-minute shifts and expanded skill progression, documented as development stages.
+- **v0.5.1:** current consolidated application and targeted fixes.
 
-## Safety and privacy
+Read [CHANGELOG.md](CHANGELOG.md) for details, including the distinction between local development stages and actual commits on GitHub. The old v0.2 archive was removed from the main branch; it remains available in Git history.
 
-No external requests, telemetry, user-account credentials, network scans, real device administration, remote access or privilege elevation. Fictional session codes must never be mistaken for real remote-support credentials. Never import a backup you do not trust; JSON import is designed for local data. The program does not run shell commands on Windows.
+For planned features, see [ROADMAP.md](ROADMAP.md). A real Windows virtual-machine mode is **not implemented**.
 
-## Author and project status
+## Project and attribution
 
-Portfolio project by [Wojciech Żydek](https://github.com/Wojciechai), built collaboratively with ChatGPT. The release history is locally prepared for review and publication; it has not been pushed to GitHub automatically.
+Created as a learning and portfolio project by [Wojciech Żydek](https://github.com/Wojciechai) with assistance from ChatGPT.
 
-**License:** Not selected; the suggested first repository is private. No open-source license is claimed. Choose a license explicitly if you later want to grant public reuse rights.
+**License:** No open-source license has been selected yet. The repository is public, but that does not automatically grant permission to redistribute or reuse its source code.
