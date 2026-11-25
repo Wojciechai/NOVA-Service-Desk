@@ -1,63 +1,75 @@
 # Changelog — NOVA Service Desk
 
-This project uses `MAJOR.MINOR.PATCH` versioning. New features increase MINOR; isolated bug fixes/hotfixes increase PATCH. Changes are recorded when a release is prepared, not retroactively invented.
+Project versions follow `MAJOR.MINOR.PATCH`: features increase MINOR; actual verified fixes increase PATCH. Entries below refer to generated local release snapshots, not fabricated public downloads or user bug reports. Dates represent build dates.
 
-## [0.2.0] — 2026-11-24
-
-### Added
-
-- Virtual **calendar** with manual progression through workdays and a backlog of older tickets.
-- **12 authored incidents across 10 days**, including recurring clients and more complex cases.
-- Template rotation after day 10 (up to 180 virtual days), explicitly identified as reused scenarios.
-- **Special cases** requiring higher trainee levels (company VPN incident and suspicious attachment).
-- **XP and levels** with difficulty-based rewards, mistake penalties, and a completion history.
-- **NOVA Remote Assist**, a choice-driven mock remote desktop that includes user guidance, fictional session code, consent, selectable app windows, repair actions, and session termination.
-- **JSON export/import** of user progress and basic attempt to migrate saved v0.1 ticket states.
-- Dedicated **Progress**, **Calendar**, and **Settings** panels.
-
-### Changed
-
-- Incident handling is now organized around reusable case types and required completion steps.
-- Queue shows source day, priority, status, step counts, and special/locked states.
-- Ticket completion requires verification and a written service note.
-- Offline-first presentation and responsive layout extended to new panels.
+## [0.5.1] — 2026-11-25 (Hotfix)
 
 ### Fixed
+- Corrected responsive remote-desktop window layout and taskbar wrapping, which inherited incompatible grid styling.
+- Corrected inconsistent emergency-ticket title on reload/import by rebuilding it from a trusted template.
+- Fixed a dead-end where a wrong action could block verification permanently in mass VPN and security incidents with no repair action.
+- Allowed correction of an accidentally misconfigured DNS through the interactive remote settings to clear the corresponding fault state.
+- Fixed visible-time undercount when a browser throttles interval execution beyond five seconds. The clock now accounts for up to two minutes of a delayed visible tick.
 
-- DNS diagnostic button IDs now map correctly to the required case checks.
-- Pre-release v0.1 migration no longer references the XP helper before initialization.
-- XP is only awarded once per ticket ID, even after resetting a case.
-- Potentially unsafe actions are logged and penalized instead of being silently accepted as correct.
-- Remote session must be ended before final ticket closure.
+### Verified
+- Added targeted state-machine tests for the actual fixes; all five targeted checks passed.
+- All original 12 training scenarios are completable; general workflow tests passed.
 
-### Security & safety
+## [0.5.0] — 2026-11-25 (Features)
 
-- All CMD commands, application windows, session IDs, network settings and incidents remain fictional.
-- The remote desktop does not read the user's screen or control any real computer.
-- The user is informed that suspicious-attachment cases should be escalated, not remotely explored.
-- Imported backup values are checked for basic structure; user-generated text is escaped before display.
+### Added
+- Skill progression in Windows, Networking, Microsoft 365, Customer Support and Security.
+- Achievement badges based on completed simulated cases.
+- Progress dashboard showing completed/open/carried/overdue counts and recent shift reports.
+- Training mode toggle for showing/hiding required workflow steps.
+- Per-customer visit/resolution counts on ticket details.
 
-### Performance / optimization
+### Maintenance
+- Hardened dynamic incident imports by rebuilding known emergency cases from trusted templates.
+- Extended save import with workday carry counts, scenario types, priorities and XP mistake metadata.
 
-- Self-contained app without external dependencies, external network requests or build steps.
-- Capped in-memory case history, chat and console output to keep browser storage bounded.
-- Only the selected section is built for display on each navigation action.
+## [0.4.0] — 2026-11-25 (Features)
 
-### Verification performed
+### Added
+- 24-real-minute simulated workday with an on-screen countdown.
+- Manual Pause/Resume and automatic pause on Alt+Tab/window focus loss (configurable).
+- Automatic roll-over of unresolved cases into the next day, preserving progress, notes, conversation history and status.
+- Carry-over counters and fictional SLA-overdue labels.
+- End-of-shift history and optional early shift completion.
+- A deterministic urgent interruption halfway through every third day from day 3.
+- Clock, events and history included in progress backup data.
 
-- JavaScript syntax checked with Node.js.
-- Browser-based scripted tests completed **12/12 authored cases** through to successful closure, including both special incidents.
-- Additional browser test completed the mock remote-access procedure, closure of a printer ticket and XP award.
-- No runtime JavaScript errors detected in those scripted test paths. This is **not** exhaustive quality assurance.
+### Notes
+- The timer stops outside the open app and does not use a remote/background scheduler.
+- Emergency incidents reuse existing cases, not a new unlimited story generator.
 
-## [0.1.0] — 2026-11-24
+## [0.3.0] — 2026-11-25 (Features)
 
-### Initial prototype
+### Added
+- Interactive *fictional* Windows desktop in NOVA Remote Assist, launched only after consent.
+- Clickable desktop/taskbar programs: settings/network, simulated CMD, company app/Outlook/Teams, devices/printers, Task Manager and Explorer.
+- Stateful fictional device settings (e.g. DNS, DHCP, proxy, Outlook offline, printer queue, audio device, startup app).
+- Repair choices, incorrect choices with consequences, console output reflecting device state, and verification guards.
+- Existing v0.2 remote-session safety checks and incident flow retained.
 
-- Offline HTML-based helpdesk simulator.
-- Three practice cases: broken DNS, blocked account, and offline Outlook.
-- Tickets, simple livechat, simulated console, action panel, reports and local browser persistence.
+### Maintenance
+- Normalized missing device/remote fields in saved v0.2 ticket data without deleting XP or notes.
 
-## Hotfix policy
+## [0.2.0] — 2026-11-24 (Existing baseline)
 
-If a bug is found after release, record it as `0.2.1`, `0.2.2`, etc., with a short description, what was affected, what changed and how it was tested. A hotfix is not claimed until a corrected build is actually created.
+- Calendar with manual day advance, 12 authored incidents over 10 days, recurring fictional employees and special P1 cases.
+- XP, levels, simulated remote-support choices, knowledge base and JSON backup.
+- Prior improvements to ticket validation, legacy v0.1 import and no-repeat XP awards.
+- Existing original baseline retained as the first commit.
+
+## [0.1.0] — 2026-11-24 (Earlier prototype)
+
+- Three basic tickets, chat, simulated CMD, diagnostics and local browser persistence.
+- This version is documented for completeness but not one of the five prepared publishing commits.
+
+## Fix tracking policy
+
+An issue becomes a **hotfix** only when an actual defect is identified and corrected. Preventive hardening, refactoring and performance work are documented as maintenance/optimization rather than made-up incidents. The `v0.5.1` entries above are identified reproducible issues found during development review; they were not attributed to real users.
+## GitHub publication note — 2026-11-25
+
+The initial public GitHub repository already contained v0.2.0 files and its own commit history. The connected integration added the **combined v0.5.1 application** in one real `feat(simulation)` commit, followed by separate documentation, regression-test and changelog commits. Earlier v0.3.0/v0.4.0/v0.5.0 feature phases are documented from the locally prepared release snapshots; they are **not** represented as individual commits on the public GitHub branch. No prior Git history was rewritten.
