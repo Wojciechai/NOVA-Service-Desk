@@ -4,6 +4,29 @@ All notable **application changes** are recorded here, with newest versions firs
 
 Dates refer to when the development versions were prepared. The v0.3.0, v0.4.0 and v0.5.0 entries describe actual development stages that were subsequently combined into the current v0.5.1 application; they are **not separate public GitHub releases**.
 
+## [0.6.0] — 2026-11-26 — Service Desk Operations (first iteration)
+
+### Added
+- A **Helpdesk agent dashboard** with active tickets, urgent P1 incidents, pending-customer cases, carry-over totals and direct links to the relevant work.
+- **Ticket search, status filters and sorting** by creation order or priority. Searches can use a ticket ID, user, department, device or issue title.
+- **NOVA Mail**, an offline training inbox with received/sent views, case-linked message threads, a reply composer and the option to set a ticket to **Waiting for Customer**.
+- Separate **Waiting for Customer**, **Reopened**, **Resolved** and **Closed** ticket states, alongside existing new/in-progress cases. A technician can pause the workflow and resume it without losing the ticket history.
+- A resolution evidence choice: confirmation by a customer, or sufficient technical verification without immediate customer confirmation.
+- A scripted follow-up: if the original Outlook case **INC-1003** is marked resolved on technical evidence alone, the issue can recur the next simulated day, opening the same ticket again with its original notes and diagnostic history.
+- A scripted reply to selected pending e-mail threads on a later simulated day, returning the case to the active queue.
+- A notification panel for replies and reopened cases that does not take the technician away from the current ticket.
+- Extended JSON import/export and local persistence for message threads, confirmation evidence, reopened status, follow-up flags and notifications.
+
+### Changed
+- Resolved means a technical resolution has been recorded; it is no longer treated as identical to formally Closed. Resolved cases are automatically closed after two simulated days if not reopened.
+- Previously completed tickets do not count as outstanding carry-over or SLA-overdue cases.
+- The simulated inbox is explicit that no real e-mail is sent.
+
+### Verification and limits
+- Application JavaScript syntax passed V8 parsing; simulated-DOM checks completed all 12 original case workflows and the new Outlook reopen/mail-reply scenario.
+- A new operations regression script is included for repeatable Node-based local checks.
+- The reopening and e-mail response systems are **authored training flows, not a general conversational AI or unlimited event generator**. Full browser UI testing, stronger approval workflows and separate response/resolution SLA clocks remain future work.
+
 ## [0.5.1] — 2026-11-25 — Bug fixes / Hotfix
 
 ### Fixed
