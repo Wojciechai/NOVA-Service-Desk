@@ -1,8 +1,8 @@
 # NOVA Service Desk
 
-**Offline IT Helpdesk training simulator** · **v0.5.1** · HTML / CSS / JavaScript · Polish interface
+**Offline IT Helpdesk training simulator** · **v0.6.0** · HTML / CSS / JavaScript · Polish interface
 
-NOVA Service Desk is a personal portfolio and learning project that simulates day-to-day work in a fictional IT support department. It combines incident tickets, customer conversations, a mock remote-support desktop, a timed shift and skill progression.
+NOVA Service Desk is a personal portfolio and learning project that simulates day-to-day work in a fictional IT support department. It combines incident tickets, customer conversations, an offline simulated mail inbox, a mock remote-support desktop, a timed shift and skill progression.
 
 > **This is a simulation, not remote-access software.** NOVA does not connect to real computers, administer Windows, or use TeamViewer. Incidents, users, devices and tool outputs are fictional.
 
@@ -10,9 +10,9 @@ NOVA Service Desk is a personal portfolio and learning project that simulates da
 
 1. Download [`NOVA_Service_Desk.html`](NOVA_Service_Desk.html) using **Download raw file** on GitHub, or clone the repository.
 2. Open the HTML file in a modern desktop browser (Chrome, Edge or Opera GX).
-3. Select an incident, investigate it, perform the simulated actions and document the result.
+3. Start on the agent dashboard; use the searchable ticket queue to select an incident, investigate it, perform the simulated actions and document the result.
 4. For remote-support cases, complete the customer guidance, session code and consent steps before opening the simulated desktop.
-5. Verify the fix, end an active remote session and close the case with a technical note.
+5. Verify the fix, end an active remote session, record a technical note and mark the case Resolved. You may document customer confirmation or technical evidence without customer confirmation. Resolved and Closed are distinct.
 
 The application runs locally **without installation, server, virtual machine, API key or internet connection**. Node.js is only needed for optional regression tests.
 
@@ -20,13 +20,13 @@ The application runs locally **without installation, server, virtual machine, AP
 
 | Area | What you can practice |
 | --- | --- |
-| Ticket management | Priorities, troubleshooting, case notes, verification, customer history and fictional SLA indicators |
-| Remote assistance | A consent-based, simulated remote session with a clickable Windows-like desktop |
+| Ticket management | Dashboard, search/filter/sort, priorities, lifecycle status, case notes, verification and fictional SLA indicators |
+| NOVA Mail | Offline inbox/sent messages linked to selected cases, outgoing replies and scripted customer follow-ups |\n| Remote assistance | A consent-based, simulated remote session with a clickable Windows-like desktop |
 | Troubleshooting | Fictional network, DNS, DHCP, Outlook, printer, device and process problems |
 | Diagnostic tools | Simulated commands such as `ipconfig /all`, `ping`, `nslookup` and `tasklist` |
 | Decisions and mistakes | Changing virtual device settings, creating additional faults and recovering from incorrect actions |
 | Work calendar | A 24-minute active-use shift, manual pause, optional auto-pause on Alt+Tab, and shift summaries |
-| Backlog and interruptions | Automatic carry-over of unfinished tickets, recurring clients and scheduled urgent incidents |
+| Backlog and interruptions | Automatic carry-over, notifications, recurring clients, scripted replies and selected reopened incidents |
 | Progression | XP, levels, skill categories, achievements and optional training hints |
 | Saving progress | Browser `localStorage`, JSON backup export and import |
 
@@ -39,15 +39,15 @@ When a shift ends, unfinished tickets move to the next simulated day **with thei
 ### Scenarios and limitations
 
 - The first 10 simulated days include **12 authored cases**. Additional days rotate existing case templates rather than generating unlimited new problems.
-- Urgent interruptions are scheduled using predefined scenarios; they are not live events.
+- Urgent interruptions and mail follow-ups use predefined scripts; they are not live events. **Current automatic reopen example:** INC-1003 (Outlook), after a technically verified resolution without customer confirmation. Other scripted replies can resume selected Waiting for Customer email threads on a later simulated day.
 - The virtual desktop and CMD support **implemented actions only**. They are not a complete Windows installation.
-- Customer chat is rule-driven, not connected to an AI service.
+- Customer chat and NOVA Mail are rule-driven, not connected to an AI service. Composing an email saves it only inside this offline simulation, not to any real mail service.
 - XP represents **in-game progress**, not commercial experience, certification or independently verified proficiency.
 - No real computer settings, accounts or remote sessions are changed.
 
 ## Saving and upgrading
 
-Progress is stored locally in the browser. With `file://` pages, storage access can differ between browsers or file locations.
+Progress, mail threads, lifecycle status and notifications are stored locally in the browser. With `file://` pages, storage access can differ between browsers or file locations.
 
 **Before moving the HTML file or upgrading from an older copy, export your progress as JSON.** After opening the new version, import the backup and confirm that your progress was restored. Keep the original backup until checked.
 
@@ -70,7 +70,7 @@ Optional automated checks:
 ```bash
 node scripts/regression.js NOVA_Service_Desk.html
 node scripts/scenario-checks.js NOVA_Service_Desk.html
-node scripts/hotfix-checks.js NOVA_Service_Desk.html
+node scripts/hotfix-checks.js NOVA_Service_Desk.html\nnode scripts/operations-checks.js NOVA_Service_Desk.html
 ```
 
 These scripts exercise selected application states with a **stubbed browser environment**. They do not replace a full end-to-end test in a real browser. See [TESTS.md](TESTS.md) for recorded checks and outstanding manual validation.
@@ -79,11 +79,11 @@ These scripts exercise selected application states with a **stubbed browser envi
 
 - **v0.2.0:** ticket system, simulated calendar, clients and initial Remote Assist.
 - **v0.3.0–v0.5.0:** interactive desktop, 24-minute shifts and expanded skill progression, documented as development stages.
-- **v0.5.1:** current consolidated application and targeted fixes.
+- **v0.5.1:** consolidated interactive simulator and targeted fixes.\n- **v0.6.0:** agent dashboard, searchable queues, NOVA Mail, customer-waiting states, evidence-backed resolution and a scripted reopen/follow-up workflow.
 
 Read [CHANGELOG.md](CHANGELOG.md) for details, including the distinction between local development stages and actual commits on GitHub. The old v0.2 archive was removed from the main branch; it remains available in Git history.
 
-For planned features, see [ROADMAP.md](ROADMAP.md). A real Windows virtual-machine mode is **not implemented**.
+For planned features, see [ROADMAP.md](ROADMAP.md). Full enterprise integrations, a real Windows virtual-machine mode, advanced SLA timers, and an unrestricted AI email correspondent are **not implemented**.
 
 ## Project and attribution
 
