@@ -57,21 +57,42 @@ main{padding:26px clamp(18px,3vw,43px) 42px;min-width:0}.heading{display:flex;al
 .client-repeat{margin:8px 0 10px;color:var(--blue)}
 @media(max-width:700px){.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
+
+/* v0.6: Operations dashboard, searchable queues and simulated mail */
+.queue-tools{padding:12px 14px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.queue-tools input{grid-column:1 / -1}
+.queue-tools input,.queue-tools select{padding:9px;font-size:12px}
+.queue-empty{padding:24px 15px;color:var(--muted);font-size:12px;line-height:1.5}
+.ops-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.ops-callout{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px}
+.ops-callout p{color:var(--muted);line-height:1.6;margin:7px 0}
+.ops-feed{display:flex;flex-direction:column;gap:8px;margin:13px 0}
+.ops-row{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--panel2);padding:12px;border:1px solid var(--border);border-radius:9px}
+.ops-row strong{display:block;margin-bottom:5px}
+.mail-layout{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(0,1.6fr);gap:13px}
+.mail-folders{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0}
+.mail-item{width:100%;display:block;text-align:left;border:1px solid var(--border);border-radius:9px;background:var(--panel2);color:var(--text);padding:12px;margin:8px 0}
+.mail-item.selected{border-color:var(--accent);background:#213b49}
+.mail-item.unread strong:after{content:' ●';color:var(--accent)}
+.mail-body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;background:#0d1b2c;border:1px solid var(--border);padding:15px;border-radius:9px;margin:12px 0}
+.mail-compose{display:grid;gap:9px}
+.mail-compose textarea{min-height:115px}
+@media(max-width:900px){.mail-layout,.ops-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="app">
 <aside>
   <div class="brand"><div class="mark">N</div><div>NOVA Service Desk<small>Training environment · v0.5.1</small></div></div>
-  <div><div class="navtitle">Środowisko pracy</div><button type="button" class="navbtn active" data-page="work">▦ &nbsp; Centrum zgłoszeń</button><button type="button" class="navbtn" data-page="calendar">▣ &nbsp; Kalendarz</button><button type="button" class="navbtn" data-page="progress">◈ &nbsp; Postępy i XP</button><button type="button" class="navbtn" data-page="knowledge">▤ &nbsp; Baza wiedzy</button><button type="button" class="navbtn" data-page="settings">⚙ &nbsp; Dane i ustawienia</button></div>
+  <div><div class="navtitle">Środowisko pracy</div><button type="button" class="navbtn" data-page="dashboard">▤ &nbsp; Dashboard</button><button type="button" class="navbtn active" data-page="work">▦ &nbsp; Centrum zgłoszeń</button><button type="button" class="navbtn" data-page="mail">✉ &nbsp; NOVA Mail</button><button type="button" class="navbtn" data-page="calendar">▣ &nbsp; Kalendarz</button><button type="button" class="navbtn" data-page="progress">◈ &nbsp; Postępy i XP</button><button type="button" class="navbtn" data-page="knowledge">▤ &nbsp; Baza wiedzy</button><button type="button" class="navbtn" data-page="settings">⚙ &nbsp; Dane i ustawienia</button></div>
   <div class="bottomnote"><strong>Lokalnie i offline</strong><br>Scenariusze są fikcyjne. „Zdalny pulpit” to interaktywny model testowy, nie dostęp do Windows ani TeamViewer.<br><br>Postępy przechowywane lokalnie w przeglądarce. Eksportuj kopię zapasową w ustawieniach.</div>
 </aside>
 <main>
   <div class="heading"><div><h1 id="heading">Centrum zgłoszeń</h1><p id="subtitle" class="desc">Praktyka Helpdesk L1 · incydenty, klienci i diagnostyka.</p></div><span class="pill">● OFFLINE · NOVA v0.2.0</span></div>
   <div id="shiftclock" class="shiftclock" aria-label="Zegar symulacji"></div>
   <div id="stats" class="stats"></div>
-  <div id="workpage" class="grid"><section class="panel"><div class="panelhead"><h2>Kolejka zgłoszeń</h2><span id="ticketcount" class="tiny"></span></div><div id="ticketlist" class="ticketlist"></div></section><section class="panel"><div id="ticketdetail" class="detail"></div></section></div>
-  <div id="calendarpage" class="hidden"></div>
+  <div id="dashboardpage" class="hidden"></div><div id="workpage" class="grid"><section class="panel"><div class="panelhead"><h2>Kolejka zgłoszeń</h2><span id="ticketcount" class="tiny"></span></div><div id="queuecontrols" class="queue-tools"></div><div id="ticketlist" class="ticketlist"></div></section><section class="panel"><div id="ticketdetail" class="detail"></div></section></div>
+  <div id="mailpage" class="hidden"></div><div id="calendarpage" class="hidden"></div>
   <div id="progresspage" class="hidden"></div>
   <div id="knowledgepage" class="hidden"></div>
   <div id="settingspage" class="hidden"></div>
@@ -108,7 +129,7 @@ function allCases(day){const result=[];for(let n=1;n<=Math.min(day,MAX_DAYS);n++
 function dayCases(day){return [...casesForDay(day),...(state.extraCases||[]).filter(c=>c.day===day)];}
 
 const defaultItem=c=>({status:'open',checks:{},chat:[{side:'client',text:c.issue}],console:['NOVA SIM > Wpisz help, aby zobaczyć polecenia.'],notes:'',actions:[],penalties:0,remote:{stage:0,app:'desktop',startOpen:false},faults:{},pc:{},createdAt:Date.now()});
-function fresh(){return {version:VERSION,startDate:startLocal(),day:1,page:'work',selected:'INC-1001',tab:'chat',calendarOffset:0,items:{},earned:{},history:[],training:true,autoPause:true,extraCases:[],shiftHistory:[],clock:{remainingMs:1440000,manualPaused:false,autoPaused:false,lastTick:0,triggeredDays:[]}};}
+function fresh(){return {version:VERSION,startDate:startLocal(),day:1,page:'dashboard',queueSearch:'',queueStatus:'all',queueSort:'newest',mailFolder:'inbox',mailTicket:null,selected:'INC-1001',tab:'chat',calendarOffset:0,items:{},earned:{},history:[],training:true,autoPause:true,extraCases:[],shiftHistory:[],clock:{remainingMs:1440000,manualPaused:false,autoPaused:false,lastTick:0,triggeredDays:[]}};}
 let state;
 function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&v.items&&v.startDate){state={...fresh(),...v};state.clock={...fresh().clock,...(v.clock||{}),lastTick:Date.now()};state.autoPause=v.autoPause!==false;state.extraCases=sanitizeExtraCases(v.extraCases);state.shiftHistory=Array.isArray(v.shiftHistory)?v.shiftHistory.slice(-180):[];return;}}catch{}
 state=fresh();try{const old=JSON.parse(localStorage.getItem(OLD_KEY)||'null');if(old&&old.items){for(const c of RAW.slice(0,3)){const it=old.items[c.id];if(!it)continue;const copy={...defaultItem(c),...it,remote:{stage:0,app:'desktop',startOpen:false},faults:{},pc:{}};copy.chat=(it.chat||[]).map(m=>({...m,side:m.side==='user'?'client':m.side==='agent'?'agent':'system'}));state.items[c.id]=copy;if(copy.status==='resolved')state.earned[c.id]=baseXP(c); }state.selected=old.selected||'INC-1001';}}catch{}}
@@ -149,13 +170,40 @@ function penalize(message){const it=item();it.penalties++;logged(it,'BŁĄD: '+m
 function changePage(p){state.page=p;persist();render()}
 function render(){ensureItems();refreshClock();const all=cases(),resolved=all.filter(c=>state.items[c.id].status==='resolved').length;const waiting=all.filter(c=>state.items[c.id].status!=='resolved').length;const ng=nextGoal();
 byId('stats').innerHTML=`<div class="stat"><span>Symulowany dzień pracy</span><strong>${state.day}</strong><small>${formatDate(dateAt(state.startDate,state.day-1))}</small></div><div class="stat"><span>Rozwiązane zgłoszenia</span><strong>${resolved}</strong><small>${waiting} w kolejce</small></div><div class="stat"><span>Poziom Helpdesk</span><strong>LVL ${level()}</strong><small>${totalXP()} XP łącznie</small></div><div class="stat"><span>Nowe zgłoszenia dziś</span><strong>${dayCases(state.day).length}</strong><small>${all.filter(c=>c.special).length} specjalnych do tej pory</small></div>`;
-const labels={work:['Centrum zgłoszeń','Kolejka incydentów, rozmowy i zdalna pomoc'],calendar:['Kalendarz pracy','Każdy kolejny dzień dodaje zgłoszenia. Starsze pozostają w kolejce.'],progress:['Postępy i XP','Poziomy, historia rozwiązanych problemów i wyniki'],knowledge:['Baza wiedzy L1','Pomoc techniczna i procedury w środowisku szkoleniowym'],settings:['Dane i ustawienia','Eksport postępów, ustawienia treningu i reset']};
+const labels={dashboard:['Panel pracownika','Twoja zmiana, kolejka i bieżące zadania'],mail:['NOVA Mail','Fikcyjna skrzynka powiązana ze zgłoszeniami'],work:['Centrum zgłoszeń','Kolejka incydentów, rozmowy i zdalna pomoc'],calendar:['Kalendarz pracy','Każdy kolejny dzień dodaje zgłoszenia. Starsze pozostają w kolejce.'],progress:['Postępy i XP','Poziomy, historia rozwiązanych problemów i wyniki'],knowledge:['Baza wiedzy L1','Pomoc techniczna i procedury w środowisku szkoleniowym'],settings:['Dane i ustawienia','Eksport postępów, ustawienia treningu i reset']};
 byId('heading').textContent=labels[state.page][0];byId('subtitle').textContent=labels[state.page][1];
 for(const p of Object.keys(labels)){byId(p==='work'?'workpage':p+'page').classList.toggle('hidden',p!==state.page);const nav=document.querySelector(`[data-page="${p}"]`);nav.classList.toggle('active',p===state.page)}
-if(state.page==='work')renderWork(all);if(state.page==='calendar')renderCalendar();if(state.page==='progress')renderProgress();if(state.page==='knowledge')renderKnowledge();if(state.page==='settings')renderSettings();
+if(state.page==='dashboard')renderDashboard(all);if(state.page==='mail')renderMail(all);if(state.page==='work')renderWork(all);if(state.page==='calendar')renderCalendar();if(state.page==='progress')renderProgress();if(state.page==='knowledge')renderKnowledge();if(state.page==='settings')renderSettings();
 }
-function renderWork(all){const c=current();if(!c){state.selected=all[0]?.id||'INC-1001';return render();}const it=item();byId('ticketcount').textContent=all.length+' zgłoszeń';
-byId('ticketlist').innerHTML=all.slice().reverse().map(q=>{const s=state.items[q.id],u=unlocked(q);return `<button type="button" class="ticket ${q.id===state.selected?'active':''}" data-ticket="${e(q.id)}"><div class="tickethead"><span class="tiny">${e(q.id)} · dzień ${q.day}${s.carryCount?' · ↪ przeniesione '+s.carryCount+'×':''}${isOverdue(q)?' · ⚠ SLA po terminie':''}</span><span class="tag ${!u?'locked':s.status==='resolved'?'resolved':q.special?'special':q.priority.toLowerCase()}">${!u?'LVL '+q.minLevel:s.status==='resolved'?'ZAMKNIĘTE':q.special?'★ SPECJALNE':q.priority}</span></div><b>${e(q.title)}</b><span class="tiny">${e(q.user)} · ${completed(q)}/${q.required.length} kroków</span></button>`}).join('');
+const statusLabels={open:'Nowe',progress:'W trakcie',waiting:'Oczekuje na klienta',resolved:'Rozwiązane',closed:'Zamknięte',reopened:'Ponownie otwarte'};
+const completedStatus=it=>['resolved','closed'].includes(it?.status);
+const displayStatus=it=>statusLabels[it?.status]||'Nowe';
+function queueEntries(all){
+ const search=String(state.queueSearch||'').toLocaleLowerCase('pl-PL').trim();
+ const filter=state.queueStatus||'all';
+ return all.filter(c=>{
+  const it=state.items[c.id];
+  if(search&&![c.id,c.title,c.user,c.dept,c.device].some(v=>String(v||'').toLocaleLowerCase('pl-PL').includes(search)))return false;
+  if(filter==='active'&&completedStatus(it))return false;
+  if(filter==='waiting'&&it.status!=='waiting')return false;
+  if(filter==='resolved'&&!completedStatus(it))return false;
+  if(filter==='urgent'&&c.priority!=='P1')return false;
+  return true;
+ }).sort((a,b)=>state.queueSort==='oldest'?a.day-b.day:state.queueSort==='priority'?a.priority.localeCompare(b.priority)||a.day-b.day:b.day-a.day);
+}
+function renderTicketList(all){
+ const list=queueEntries(all);
+ byId('ticketcount').textContent=list.length+' / '+all.length+' zgłoszeń';
+ byId('ticketlist').innerHTML=list.length?list.map(q=>{const it=state.items[q.id],u=unlocked(q);return `<button type="button" class="ticket ${q.id===state.selected?'active':''}" data-ticket="${e(q.id)}"><div class="tickethead"><span class="tiny">${e(q.id)} · dzień ${q.day}${it.carryCount?' · ↪ '+it.carryCount+'×':''}${isOverdue(q)?' · ⚠ SLA':''}</span><span class="tag ${!u?'locked':completedStatus(it)?'resolved':q.priority.toLowerCase()}">${!u?'LVL '+q.minLevel:displayStatus(it)}</span></div><b>${e(q.title)}</b><span class="tiny">${e(q.user)} · ${q.priority} · ${completed(q)}/${q.required.length} kroków</span></button>`}).join(''):'<div class="queue-empty">Brak zgłoszeń pasujących do filtrów. Zmień kryteria lub wyczyść wyszukiwanie.</div>';
+}
+function renderDashboard(all){
+ const currentCases=all.filter(c=>!completedStatus(state.items[c.id])),urgent=currentCases.filter(c=>c.priority==='P1'),waiting=currentCases.filter(c=>state.items[c.id].status==='waiting');
+ const carried=currentCases.filter(c=>state.items[c.id].carryCount>0);
+ const headline=urgent.length?urgent:currentCases.slice().sort((a,b)=>a.priority.localeCompare(b.priority)).slice(0,4);
+ byId('dashboardpage').innerHTML=`<div class="ops-grid"><section class="card"><h2>Moja zmiana · dzień ${state.day}</h2><p class="hint">Wybierz, czym zająć się najpierw. Statusy i wyniki mają znaczenie dla przebiegu fikcyjnej pracy.</p><div class="kpi-grid"><div><strong>${currentCases.length}</strong><small>Aktywne</small></div><div><strong>${urgent.length}</strong><small>P1</small></div><div><strong>${waiting.length}</strong><small>Oczekujące</small></div><div><strong>${carried.length}</strong><small>Przeniesione</small></div></div><div class="btnrow"><button class="btn primary" data-page="work">Przejdź do kolejki</button><button class="btn" data-page="mail">Otwórz pocztę</button></div></section><section class="card"><h2>Na dziś do sprawdzenia</h2><div class="ops-feed">${headline.length?headline.map(c=>`<button class="mail-item" data-ticket="${e(c.id)}"><strong>${e(c.id)} · ${e(c.title)}</strong><span class="tiny">${e(c.user)} · ${c.priority} · ${displayStatus(state.items[c.id])}</span></button>`).join(''):'<div class="ok">Brak aktywnych spraw. Możesz sprawdzić raporty lub pocztę.</div>'}</div></section></div><div class="card" style="margin-top:13px"><h2>Praca w środowisku NOVA</h2><p class="hint">To symulacja Helpdesk L1. Skorzystaj z kolejki, diagnostyki oraz fikcyjnej poczty. Tylko zapisane i zweryfikowane działania wpływają na wynik scenariusza.</p></div>`;
+}
+function renderWork(all){const c=current();if(!c){state.selected=all[0]?.id||'INC-1001';return render();}const it=item();byId('queuecontrols').innerHTML=`<input id="queue-search" aria-label="Szukaj zgłoszeń" placeholder="Szukaj: INC, użytkownik, urządzenie..." value="${e(state.queueSearch||'')}"><select id="queue-status" aria-label="Filtr statusu">${[['all','Wszystkie'],['active','Aktywne'],['waiting','Oczekujące'],['resolved','Rozwiązane'],['urgent','Pilne P1']].map(([v,label])=>`<option value="${v}" ${state.queueStatus===v?'selected':''}>${label}</option>`).join('')}</select><select id="queue-sort" aria-label="Sortowanie">${[['newest','Najnowsze'],['oldest','Najstarsze'],['priority','Priorytet']].map(([v,label])=>`<option value="${v}" ${state.queueSort===v?'selected':''}>${label}</option>`).join('')}</select>`;
+renderTicketList(all);
 if(!unlocked(c)){byId('ticketdetail').innerHTML=`<h2>${e(c.title)}</h2><div class="notice" style="margin-top:15px">Zgłoszenie specjalne odblokuje się na poziomie ${c.minLevel}. Obecny poziom: ${level()}. Rozwiązuj pozostałe incydenty, aby zdobyć XP.</div>`;return}
 const tabs=[['chat','Livechat'],['tools','Diagnostyka'],['remote','Zdalny pulpit'],['actions','Działania'],['report','Raport']];
 byId('ticketdetail').innerHTML=`<div class="tickethead"><span class="tiny">${e(c.id)} · Dzień ${c.day}${it.carryCount?' · przeniesione '+it.carryCount+'×':''}${isOverdue(c)?' · SLA po terminie':''} · ${it.status==='resolved'?'Zamknięte':it.status==='progress'?'W trakcie':'Otwarte'}</span><span class="tag ${c.priority.toLowerCase()}">${c.priority}</span></div><h2 class="case-title">${e(c.title)}</h2><div class="meta tiny"><span>👤 ${e(c.user)}</span><span>▤ ${e(c.dept)}</span><span>▣ ${e(c.device)}</span>${c.special?'<span style="color:#ecc982">★ Przypadek specjalny</span>':''}</div><div class="issue">${e(c.issue)}</div><div class="tiny client-repeat">Historia klienta: ${all.filter(x=>x.user===c.user&&x.day<=state.day).length} zgłoszeń • ${all.filter(x=>x.user===c.user&&state.items[x.id]?.status==='resolved').length} zamkniętych</div><div class="tiny">Potencjalne XP po rozwiązaniu: <strong style="color:var(--accent)">${score(c)}</strong>${it.penalties?' · Błędne działania: '+it.penalties:''}</div><div class="tabs" role="tablist">${tabs.map(([t,label])=>`<button type="button" class="tab ${state.tab===t?'active':''}" role="tab" aria-selected="${state.tab===t}" data-tab="${t}">${label}</button>`).join('')}</div><div id="tabcontent">${renderTab(c,it)}</div>`;
@@ -339,8 +387,8 @@ else if(d.importClick)byId('importfile').click();
 else if(d.resetall){if(confirm('Czy na pewno usunąć WSZYSTKIE postępy? Tej operacji nie można cofnąć bez pliku eksportu.')){state=fresh();ensureItems();persist();render();toast('Symulator zresetowany.')}}
 });
 document.addEventListener('submit',ev=>{if(ev.target.id==='chatform'){ev.preventDefault();chatCustom(byId('chatinput').value)}if(ev.target.id==='cmdform'){ev.preventDefault();command(byId('cmdinput').value)}if(ev.target.id==='remotecmdform'){ev.preventDefault();command(byId('remotecmdinput').value)}});
-document.addEventListener('input',ev=>{if(ev.target.id==='notes')item().notes=ev.target.value});
-document.addEventListener('change',ev=>{if(ev.target.id==='importfile'){importSave(ev.target.files[0]);ev.target.value=''}if(ev.target.id==='trainingmode'){state.training=ev.target.checked;persist();render()}if(ev.target.id==='autopause'){state.autoPause=ev.target.checked;state.clock.autoPaused=state.autoPause&&!document.hasFocus();state.clock.lastTick=Date.now();persist();refreshClock()}});
+document.addEventListener('input',ev=>{if(ev.target.id==='notes')item().notes=ev.target.value;if(ev.target.id==='queue-search'){state.queueSearch=ev.target.value.slice(0,120);renderTicketList(cases())}});
+document.addEventListener('change',ev=>{if(ev.target.id==='queue-status'){state.queueStatus=ev.target.value;persist();render()}if(ev.target.id==='queue-sort'){state.queueSort=ev.target.value;persist();render()}if(ev.target.id==='importfile'){importSave(ev.target.files[0]);ev.target.value=''}if(ev.target.id==='trainingmode'){state.training=ev.target.checked;persist();render()}if(ev.target.id==='autopause'){state.autoPause=ev.target.checked;state.clock.autoPaused=state.autoPause&&!document.hasFocus();state.clock.lastTick=Date.now();persist();refreshClock()}});
 document.addEventListener('visibilitychange',()=>setAutoPause(document.hidden));
 window.addEventListener('blur',()=>setAutoPause(true));
 window.addEventListener('focus',()=>setAutoPause(false));
