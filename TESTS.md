@@ -40,3 +40,26 @@ These Node.js checks execute the browser application logic in a **stubbed DOM/lo
 - [ ] Stress test with many days of unresolved tickets.
 
 **No real remote connection or real Windows settings were touched during testing.**
+
+## v0.6.0 — Service Desk Operations (2026-11-26)
+
+**Tested using a simulated browser environment, not a full browser GUI.**
+
+- [x] Application script parsed successfully in V8.
+- [x] Dashboard booted with all three day-one tickets.
+- [x] Ticket queue search narrowed the list to the expected ticket; basic input/search flow tested.
+- [x] NOVA Mail displayed a linked case, stored an outgoing reply and changed the ticket to Waiting for Customer.
+- [x] Waiting ticket could be manually resumed without loss of its history.
+- [x] All **12/12** authored original incident workflows still reached Resolved with XP awarded.
+- [x] Outlook INC-1003 resolved via technical evidence without customer confirmation.
+- [x] A formally Closed INC-1003 was reopened after the next day transition, its fix/verification state invalidated and a new incoming email/notification generated.
+- [x] Agent reply to the reopened case moved it to Waiting for Customer; a later scripted reply resumed it to In Progress.
+- [x] Previously earned XP was preserved rather than awarded again on reopen.
+
+Reproduce the new workflow tests locally with:
+
+```bash
+node scripts/operations-checks.js NOVA_Service_Desk.html
+```
+
+**Still requires manual checking:** Chrome/Edge/Opera GX interactions, responsive layout, keyboard navigation, JSON file-picker import/export and full 24-minute real-time shifts. A simulated-DOM test alone cannot verify visual correctness.
