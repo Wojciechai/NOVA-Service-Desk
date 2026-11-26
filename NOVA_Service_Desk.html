@@ -89,7 +89,7 @@ main{padding:26px clamp(18px,3vw,43px) 42px;min-width:0}.heading{display:flex;al
 </aside>
 <main>
   <div class="heading"><div><h1 id="heading">Centrum zgłoszeń</h1><p id="subtitle" class="desc">Praktyka Helpdesk L1 · incydenty, klienci i diagnostyka.</p></div><span class="pill">● OFFLINE · NOVA v0.2.0</span></div>
-  <div id="shiftclock" class="shiftclock" aria-label="Zegar symulacji"></div>
+  <div id="shiftclock" class="shiftclock" aria-label="Zegar symulacji"></div><div id="nova-alerts" aria-live="polite"></div>
   <div id="stats" class="stats"></div>
   <div id="dashboardpage" class="hidden"></div><div id="workpage" class="grid"><section class="panel"><div class="panelhead"><h2>Kolejka zgłoszeń</h2><span id="ticketcount" class="tiny"></span></div><div id="queuecontrols" class="queue-tools"></div><div id="ticketlist" class="ticketlist"></div></section><section class="panel"><div id="ticketdetail" class="detail"></div></section></div>
   <div id="mailpage" class="hidden"></div><div id="calendarpage" class="hidden"></div>
@@ -129,9 +129,9 @@ function allCases(day){const result=[];for(let n=1;n<=Math.min(day,MAX_DAYS);n++
 function dayCases(day){return [...casesForDay(day),...(state.extraCases||[]).filter(c=>c.day===day)];}
 
 const defaultItem=c=>({status:'open',checks:{},chat:[{side:'client',text:c.issue}],console:['NOVA SIM > Wpisz help, aby zobaczyć polecenia.'],notes:'',actions:[],penalties:0,remote:{stage:0,app:'desktop',startOpen:false},faults:{},pc:{},createdAt:Date.now()});
-function fresh(){return {version:VERSION,startDate:startLocal(),day:1,page:'dashboard',queueSearch:'',queueStatus:'all',queueSort:'newest',mailFolder:'inbox',mailTicket:null,selected:'INC-1001',tab:'chat',calendarOffset:0,items:{},earned:{},history:[],training:true,autoPause:true,extraCases:[],shiftHistory:[],clock:{remainingMs:1440000,manualPaused:false,autoPaused:false,lastTick:0,triggeredDays:[]}};}
+function fresh(){return {version:VERSION,startDate:startLocal(),day:1,page:'dashboard',queueSearch:'',queueStatus:'all',queueSort:'newest',mailFolder:'inbox',mailTicket:null,notifications:[],selected:'INC-1001',tab:'chat',calendarOffset:0,items:{},earned:{},history:[],training:true,autoPause:true,extraCases:[],shiftHistory:[],clock:{remainingMs:1440000,manualPaused:false,autoPaused:false,lastTick:0,triggeredDays:[]}};}
 let state;
-function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&v.items&&v.startDate){state={...fresh(),...v};state.clock={...fresh().clock,...(v.clock||{}),lastTick:Date.now()};state.autoPause=v.autoPause!==false;state.extraCases=sanitizeExtraCases(v.extraCases);state.shiftHistory=Array.isArray(v.shiftHistory)?v.shiftHistory.slice(-180):[];return;}}catch{}
+function load(){try{const v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&v.items&&v.startDate){state={...fresh(),...v};state.clock={...fresh().clock,...(v.clock||{}),lastTick:Date.now()};state.autoPause=v.autoPause!==false;state.extraCases=sanitizeExtraCases(v.extraCases);state.shiftHistory=Array.isArray(v.shiftHistory)?v.shiftHistory.slice(-180):[];state.notifications=Array.isArray(v.notifications)?v.notifications.slice(-40):[];return;}}catch{}
 state=fresh();try{const old=JSON.parse(localStorage.getItem(OLD_KEY)||'null');if(old&&old.items){for(const c of RAW.slice(0,3)){const it=old.items[c.id];if(!it)continue;const copy={...defaultItem(c),...it,remote:{stage:0,app:'desktop',startOpen:false},faults:{},pc:{}};copy.chat=(it.chat||[]).map(m=>({...m,side:m.side==='user'?'client':m.side==='agent'?'agent':'system'}));state.items[c.id]=copy;if(copy.status==='resolved')state.earned[c.id]=baseXP(c); }state.selected=old.selected||'INC-1001';}}catch{}}
 load();
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch{toast('Brak zapisu w przeglądarce. Zrób eksport danych.')}}
@@ -168,7 +168,7 @@ function check(key,label){const it=item();if(!it.checks[key]){it.checks[key]=tru
 function begin(){const it=item();if(it.status==='open')it.status='progress'}
 function penalize(message){const it=item();it.penalties++;logged(it,'BŁĄD: '+message);toast(message+' (-10 XP przy zamknięciu)')}
 function changePage(p){state.page=p;persist();render()}
-function render(){ensureItems();refreshClock();const all=cases(),resolved=all.filter(c=>state.items[c.id].status==='resolved').length;const waiting=all.filter(c=>state.items[c.id].status!=='resolved').length;const ng=nextGoal();
+function render(){ensureItems();ensureMailState();refreshClock();renderAlerts();const all=cases(),resolved=all.filter(c=>state.items[c.id].status==='resolved').length;const waiting=all.filter(c=>state.items[c.id].status!=='resolved').length;const ng=nextGoal();
 byId('stats').innerHTML=`<div class="stat"><span>Symulowany dzień pracy</span><strong>${state.day}</strong><small>${formatDate(dateAt(state.startDate,state.day-1))}</small></div><div class="stat"><span>Rozwiązane zgłoszenia</span><strong>${resolved}</strong><small>${waiting} w kolejce</small></div><div class="stat"><span>Poziom Helpdesk</span><strong>LVL ${level()}</strong><small>${totalXP()} XP łącznie</small></div><div class="stat"><span>Nowe zgłoszenia dziś</span><strong>${dayCases(state.day).length}</strong><small>${all.filter(c=>c.special).length} specjalnych do tej pory</small></div>`;
 const labels={dashboard:['Panel pracownika','Twoja zmiana, kolejka i bieżące zadania'],mail:['NOVA Mail','Fikcyjna skrzynka powiązana ze zgłoszeniami'],work:['Centrum zgłoszeń','Kolejka incydentów, rozmowy i zdalna pomoc'],calendar:['Kalendarz pracy','Każdy kolejny dzień dodaje zgłoszenia. Starsze pozostają w kolejce.'],progress:['Postępy i XP','Poziomy, historia rozwiązanych problemów i wyniki'],knowledge:['Baza wiedzy L1','Pomoc techniczna i procedury w środowisku szkoleniowym'],settings:['Dane i ustawienia','Eksport postępów, ustawienia treningu i reset']};
 byId('heading').textContent=labels[state.page][0];byId('subtitle').textContent=labels[state.page][1];
@@ -195,6 +195,59 @@ function renderTicketList(all){
  const list=queueEntries(all);
  byId('ticketcount').textContent=list.length+' / '+all.length+' zgłoszeń';
  byId('ticketlist').innerHTML=list.length?list.map(q=>{const it=state.items[q.id],u=unlocked(q);return `<button type="button" class="ticket ${q.id===state.selected?'active':''}" data-ticket="${e(q.id)}"><div class="tickethead"><span class="tiny">${e(q.id)} · dzień ${q.day}${it.carryCount?' · ↪ '+it.carryCount+'×':''}${isOverdue(q)?' · ⚠ SLA':''}</span><span class="tag ${!u?'locked':completedStatus(it)?'resolved':q.priority.toLowerCase()}">${!u?'LVL '+q.minLevel:displayStatus(it)}</span></div><b>${e(q.title)}</b><span class="tiny">${e(q.user)} · ${q.priority} · ${completed(q)}/${q.required.length} kroków</span></button>`}).join(''):'<div class="queue-empty">Brak zgłoszeń pasujących do filtrów. Zmień kryteria lub wyczyść wyszukiwanie.</div>';
+}
+
+const MAIL_TYPES=['outlook','mailbox','printer','dns'];
+const isMailCase=c=>MAIL_TYPES.includes(c.type);
+function ensureMailState(){
+ for(const c of cases()){
+  const it=state.items[c.id];
+  if(!Array.isArray(it.mailThread))it.mailThread=[];
+  it.mailThread=it.mailThread.filter(m=>m&&typeof m==='object'&&['in','out'].includes(m.direction)&&typeof m.body==='string').slice(-40);
+  if(!it.mailThread.length&&isMailCase(c))it.mailThread=[{direction:'in',day:c.day,body:c.issue,unread:true}];
+ }
+}
+function renderAlerts(){
+ const notices=Array.isArray(state.notifications)?state.notifications.slice(-3).reverse():[];
+ byId('nova-alerts').innerHTML=notices.length?`<section class="card" style="margin-bottom:13px"><div class="progresshead"><h2>Powiadomienia</h2><button class="btn" data-dismiss-alerts="1">Wyczyść</button></div>${notices.map(n=>`<div class="ops-row"><div><strong>${e(n.title)}</strong><span class="tiny">Dzień ${Number(n.day)||state.day} · ${e(n.ticket)}</span></div><button class="btn" data-ticket="${e(n.ticket)}">Otwórz</button></div>`).join('')}</section>`:'';
+}
+function renderMail(all){
+ const mailbox=all.filter(c=>state.items[c.id]?.mailThread?.length);
+ const folder=state.mailFolder==='sent'?'sent':'inbox';
+ const candidates=mailbox.filter(c=>state.items[c.id].mailThread.some(m=>m.direction===(folder==='sent'?'out':'in'))).slice().reverse();
+ const selected=candidates.find(c=>c.id===state.mailTicket)||candidates[0];
+ const unread=mailbox.reduce((n,c)=>n+state.items[c.id].mailThread.filter(m=>m.direction==='in'&&m.unread).length,0);
+ const thread=selected?state.items[selected.id].mailThread:[];
+ byId('mailpage').innerHTML=`<p class="hint">To lokalna skrzynka szkoleniowa. Wiadomości nie wychodzą do prawdziwych odbiorców.</p><div class="mail-layout"><section class="card"><h2>NOVA Mail</h2><div class="mail-folders"><button class="btn ${folder==='inbox'?'primary':''}" data-mail-folder="inbox">Odebrane (${unread})</button><button class="btn ${folder==='sent'?'primary':''}" data-mail-folder="sent">Wysłane</button></div>${candidates.length?candidates.map(c=>`<button class="mail-item ${selected.id===c.id?'selected':''} ${state.items[c.id].mailThread.some(m=>m.direction==='in'&&m.unread)?'unread':''}" data-mail-ticket="${e(c.id)}"><strong>${e(c.title)}</strong><div class="tiny">${e(c.user)} · ${e(c.id)} · ${state.items[c.id].mailThread.length} wiad.</div></button>`).join(''):'<p class="hint">Brak wiadomości w tym folderze.</p>'}</section><section class="card">${selected?`<div class="progresshead"><div><h2>${e(selected.title)}</h2><span class="tiny">${e(selected.user)} · ${e(selected.id)}</span></div><button class="btn" data-ticket="${e(selected.id)}">Otwórz ticket</button></div><div class="mail-thread">${thread.map(m=>`<div class="mail-body"><strong>${m.direction==='in'?e(selected.user):'Helpdesk L1'} · Dzień ${Number(m.day)||selected.day}</strong><p>${e(m.body)}</p></div>`).join('')}</div><form id="mailform" class="mail-compose"><label for="mail-reply" class="tiny">Odpowiedź do klienta (minimum 15 znaków)</label><textarea id="mail-reply" maxlength="1500" placeholder="Dzień dobry, w związku ze zgłoszeniem..."></textarea><label class="clock-pref"><input type="checkbox" id="mail-wait" checked> Oczekuję odpowiedzi klienta</label><button class="btn primary">Wyślij wiadomość (symulacja)</button></form>`:'<p class="hint">Wybierz wiadomość po lewej stronie.</p>'}</section></div>`;
+ state.mailTicket=selected?.id||null;
+}
+function selectMailTicket(id){const c=getCase(id);if(!c)return;state.mailTicket=id;for(const m of state.items[id].mailThread||[])if(m.direction==='in')m.unread=false;persist();render()}
+function sendMail(){
+ const c=getCase(state.mailTicket);if(!c)return toast('Wybierz wiadomość.');
+ const body=String(byId('mail-reply')?.value||'').trim();if(body.length<15)return toast('Napisz przynajmniej 15 znaków.');
+ const it=state.items[c.id];it.mailThread.push({direction:'out',day:state.day,body,unread:false});it.mailThread=it.mailThread.slice(-40);
+ logged(it,'Wysłano fikcyjnego e-maila do klienta');
+ if(byId('mail-wait')?.checked&&!completedStatus(it))it.status='waiting';
+ state.mailFolder='inbox';persist();render();toast('Wysłano tylko w symulatorze – nie jest to prawdziwy e-mail.');
+}
+function waitForCustomer(){const c=current(),it=item();if(!c||completedStatus(it))return;it.status='waiting';logged(it,'Oczekiwanie na klienta');persist();render();toast('Zgłoszenie oczekuje na klienta.')}
+function resumeCase(){const c=current(),it=item();if(!c||completedStatus(it))return;it.status='progress';logged(it,'Wznowiono obsługę');persist();render()}
+function closeConfirmed(){const c=current(),it=item();if(!c||it.status!=='resolved')return;it.status='closed';logged(it,'Formalnie zamknięto zgłoszenie');persist();render()}
+function processCustomerFollowups(){
+ for(const c of allCases(state.day)){
+  const it=state.items[c.id];if(!it)continue;
+  if(it.status==='resolved'&&it.confirmation==='technical'&&c.id==='INC-1003'&&!it.followupGenerated&&state.day>Number(it.resolvedDay||0)){
+   it.followupGenerated=true;it.status='reopened';delete it.checks.fix;delete it.checks.verify;
+   it.pc=it.pc||{};it.pc.outlookOffline=true;
+   if(!Array.isArray(it.mailThread))it.mailThread=[];
+   it.mailThread.push({direction:'in',day:state.day,body:'Dzień dobry, po ponownym uruchomieniu Outlook znowu nie pobiera wiadomości. Czy możemy wrócić do zgłoszenia?',unread:true});
+   logged(it,'Klient ponownie otworzył zgłoszenie po nawrocie problemu');
+   state.notifications.push({title:'Klient ponownie otworzył zgłoszenie',day:state.day,ticket:c.id});
+  }else if(it.status==='resolved'&&it.resolvedDay&&state.day-Number(it.resolvedDay)>=2){
+   it.status='closed';logged(it,'Automatyczne zamknięcie po okresie potwierdzenia – bez założenia, że brak odpowiedzi jest dowodem naprawy');
+  }
+ }
+ state.notifications=state.notifications.slice(-40);
 }
 function renderDashboard(all){
  const currentCases=all.filter(c=>!completedStatus(state.items[c.id])),urgent=currentCases.filter(c=>c.priority==='P1'),waiting=currentCases.filter(c=>state.items[c.id].status==='waiting');
@@ -225,16 +278,16 @@ function createEmergency(){
  logged(state.items[c.id],'Zgłoszenie pilne w połowie zmiany');
  persist();render();toast('Pilne zgłoszenie '+c.id+'! Oceń wpływ i priorytet.');
 }
-function isOverdue(c){return state.items[c.id]?.status!=='resolved'&&state.day>c.day+(c.priority==='P1'?0:c.priority==='P2'?1:2)}
+function isOverdue(c){return !completedStatus(state.items[c.id])&&state.day>c.day+(c.priority==='P1'?0:c.priority==='P2'?1:2)}
 function finishShift(reason){
  if(state.day>=MAX_DAYS){state.clock.manualPaused=true;toast('Osiągnięto limit 180 dni. Zapisz postępy.');refreshClock();return;}
  const previous=state.day;
- const list=cases(),unresolved=list.filter(c=>state.items[c.id]?.status!=='resolved');
+ const list=cases(),unresolved=list.filter(c=>!completedStatus(state.items[c.id]));
  for(const c of unresolved){const it=state.items[c.id];it.carryCount=(it.carryCount||0)+1;if(!it.carrySince)it.carrySince=c.day;}
  const ended=list.filter(c=>state.items[c.id].status==='resolved'&&state.history.some(h=>h.id===c.id&&h.day===previous)).length;
  state.shiftHistory.push({day:previous,closed:ended,carried:unresolved.length,reason});
  state.shiftHistory=state.shiftHistory.slice(-180);
- state.day++;state.selected=dayCases(state.day)[0]?.id||unresolved[0]?.id||state.selected;
+ state.day++;state.selected=dayCases(state.day)[0]?.id||unresolved[0]?.id||state.selected;processCustomerFollowups();
  state.tab='chat';state.clock.remainingMs=1440000;state.clock.lastTick=Date.now();state.clock.manualPaused=false;
  ensureItems();persist();render();toast('Dzień '+previous+' zakończony. Przeniesiono '+unresolved.length+' niezakończonych spraw.');
 }
@@ -242,7 +295,7 @@ function clockPauseReason(){return state.clock.manualPaused?'Pauza ręczna':stat
 function refreshClock(){
  const el=byId('shiftclock');if(!el)return;
  const c=state.clock,remain=Math.max(0,Math.ceil(c.remainingMs/1000)),min=String(Math.floor(remain/60)).padStart(2,'0'),sec=String(remain%60).padStart(2,'0');
- const reason=clockPauseReason(),o=cases().filter(x=>state.items[x.id]?.status!=='resolved'&&state.items[x.id]?.carryCount).length;
+ const reason=clockPauseReason(),o=cases().filter(x=>!completedStatus(state.items[x.id])&&state.items[x.id]?.carryCount).length;
  el.innerHTML=`<div class="shiftbox"><div class="shiftmeta"><span class="tiny">DZIEŃ ${state.day} • ZMIANA TRENINGOWA</span><strong class="shifttime" aria-live="off">${min}:${sec}</strong><span class="tiny">${reason||'Zegar działa'} • 24 minuty = 1 dzień</span></div><div class="shiftbuttons"><span class="tiny">Przeniesione sprawy: <strong>${o}</strong></span><button class="btn ${reason?'primary':''}" data-clock-toggle="1">${c.manualPaused?'▶ Wznów':'Ⅱ Pauza'}</button></div></div><div class="shifttrack"><div style="width:${Math.max(0,Math.min(100,c.remainingMs/1440000*100))}%"></div></div>`;
 }
 function clockTick(){
@@ -367,7 +420,7 @@ function renderSettings(){byId('settingspage').innerHTML=`<div class="two"><sect
 function exportSave(){const blob=new Blob([JSON.stringify({...state,version:VERSION},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='NOVA_postep_v0.5.1.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 async function importSave(file){if(!file)return;try{if(file.size>3_000_000)throw Error('Plik ma więcej niż 3 MB.');const s=JSON.parse(await file.text());if(!s||typeof s!=='object'||!s.items||!Number.isInteger(s.day)||s.day<1||s.day>MAX_DAYS||typeof s.startDate!=='string'||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(s.startDate)||!s.earned||!Array.isArray(s.history))throw Error('Nieprawidłowy plik postępu NOVA.');if(!confirm('Zastąpić bieżący postęp danymi z pliku?'))return;const clean=fresh();clean.startDate=s.startDate;clean.day=s.day;clean.training=s.training!==false;clean.items=Object.fromEntries(Object.entries(s.items).filter(([k,v])=>/^INC-(100[1-9]|101[0-2]|D[0-9]{3}|E[0-9]{3})$/.test(k)&&v&&typeof v==='object').map(([k,v])=>[k,{...defaultItem({issue:'Nowe zgłoszenie'}),status:['open','progress','resolved'].includes(v.status)?v.status:'open',checks:v.checks&&typeof v.checks==='object'?v.checks:{},chat:Array.isArray(v.chat)?v.chat.slice(-100):[],console:Array.isArray(v.console)?v.console.slice(-22):[],notes:String(v.notes||'').slice(0,2500),actions:Array.isArray(v.actions)?v.actions.slice(-70):[],penalties:Math.min(100,Math.max(0,Number(v.penalties)||0)),remote:{stage:Math.max(0,Math.min(4,Number(v.remote?.stage)||0)),app:'desktop',startOpen:false},faults:(v.faults&&typeof v.faults==='object')?v.faults:{},pc:(v.pc&&typeof v.pc==='object')?v.pc:{},carryCount:Math.max(0,Math.min(180,Number(v.carryCount)||0)),carrySince:Math.max(0,Math.min(180,Number(v.carrySince)||0))}]));clean.earned=Object.fromEntries(Object.entries(s.earned).filter(([k,v])=>/^INC-/.test(k)&&Number.isFinite(Number(v))&&Number(v)>=0).map(([k,v])=>[k,Number(v)]));clean.history=s.history.filter(h=>h&&typeof h==='object').slice(-200).map(h=>({id:String(h.id||''),title:String(h.title||''),xp:Number(h.xp)||0,day:Number(h.day)||1,user:String(h.user||''),type:String(h.type||''),priority:String(h.priority||''),penalties:Math.max(0,Number(h.penalties)||0)}));clean.clock={...fresh().clock,...(s.clock||{}),lastTick:Date.now(),autoPaused:false};clean.autoPause=s.autoPause!==false;clean.extraCases=sanitizeExtraCases(s.extraCases);clean.shiftHistory=Array.isArray(s.shiftHistory)?s.shiftHistory.slice(-180):[];state=clean;ensureItems();persist();render();toast('Postępy przywrócone.')}catch(err){toast('Nie udało się wczytać pliku: '+err.message)}}
 document.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;const d=b.dataset;
-if(d.page)changePage(d.page);else if(d.ticket){state.selected=d.ticket;state.page='work';state.tab='chat';persist();render()}
+if(d.page)changePage(d.page);else if(d.mailFolder){state.mailFolder=d.mailFolder;state.mailTicket=null;persist();render()}else if(d.mailTicket)selectMailTicket(d.mailTicket);else if(d.dismissAlerts){state.notifications=[];persist();render()}else if(d.waitTicket)waitForCustomer();else if(d.resumeTicket)resumeCase();else if(d.closeConfirmed)closeConfirmed();else if(d.ticket){state.selected=d.ticket;state.page='work';state.tab='chat';persist();render()}
 else if(d.tab){state.tab=d.tab;persist();render()}
 else if(d.chatask)chatAsk(d.chatask);
 else if(d.action)takeAction(d.action);
@@ -386,7 +439,7 @@ else if(d.export)exportSave();
 else if(d.importClick)byId('importfile').click();
 else if(d.resetall){if(confirm('Czy na pewno usunąć WSZYSTKIE postępy? Tej operacji nie można cofnąć bez pliku eksportu.')){state=fresh();ensureItems();persist();render();toast('Symulator zresetowany.')}}
 });
-document.addEventListener('submit',ev=>{if(ev.target.id==='chatform'){ev.preventDefault();chatCustom(byId('chatinput').value)}if(ev.target.id==='cmdform'){ev.preventDefault();command(byId('cmdinput').value)}if(ev.target.id==='remotecmdform'){ev.preventDefault();command(byId('remotecmdinput').value)}});
+document.addEventListener('submit',ev=>{if(ev.target.id==='chatform'){ev.preventDefault();chatCustom(byId('chatinput').value)}if(ev.target.id==='cmdform'){ev.preventDefault();command(byId('cmdinput').value)}if(ev.target.id==='remotecmdform'){ev.preventDefault();command(byId('remotecmdinput').value)}if(ev.target.id==='mailform'){ev.preventDefault();sendMail()}});
 document.addEventListener('input',ev=>{if(ev.target.id==='notes')item().notes=ev.target.value;if(ev.target.id==='queue-search'){state.queueSearch=ev.target.value.slice(0,120);renderTicketList(cases())}});
 document.addEventListener('change',ev=>{if(ev.target.id==='queue-status'){state.queueStatus=ev.target.value;persist();render()}if(ev.target.id==='queue-sort'){state.queueSort=ev.target.value;persist();render()}if(ev.target.id==='importfile'){importSave(ev.target.files[0]);ev.target.value=''}if(ev.target.id==='trainingmode'){state.training=ev.target.checked;persist();render()}if(ev.target.id==='autopause'){state.autoPause=ev.target.checked;state.clock.autoPaused=state.autoPause&&!document.hasFocus();state.clock.lastTick=Date.now();persist();refreshClock()}});
 document.addEventListener('visibilitychange',()=>setAutoPause(document.hidden));
