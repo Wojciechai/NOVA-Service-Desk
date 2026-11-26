@@ -236,13 +236,18 @@ function closeConfirmed(){const c=current(),it=item();if(!c||it.status!=='resolv
 function processCustomerFollowups(){
  for(const c of allCases(state.day)){
   const it=state.items[c.id];if(!it)continue;
-  if(it.status==='resolved'&&it.confirmation==='technical'&&c.id==='INC-1003'&&!it.followupGenerated&&state.day>Number(it.resolvedDay||0)){
+  if(['resolved','closed'].includes(it.status)&&it.confirmation==='technical'&&c.id==='INC-1003'&&!it.followupGenerated&&state.day>Number(it.resolvedDay||0)){
    it.followupGenerated=true;it.status='reopened';delete it.checks.fix;delete it.checks.verify;
    it.pc=it.pc||{};it.pc.outlookOffline=true;
    if(!Array.isArray(it.mailThread))it.mailThread=[];
    it.mailThread.push({direction:'in',day:state.day,body:'Dzień dobry, po ponownym uruchomieniu Outlook znowu nie pobiera wiadomości. Czy możemy wrócić do zgłoszenia?',unread:true});
    logged(it,'Klient ponownie otworzył zgłoszenie po nawrocie problemu');
    state.notifications.push({title:'Klient ponownie otworzył zgłoszenie',day:state.day,ticket:c.id});
+  }else if(it.status==='waiting'&&!it.replyGenerated&&Array.isArray(it.mailThread)&&it.mailThread.some(m=>m.direction==='out'&&Number(m.day)<state.day)){
+   it.replyGenerated=true;it.status='progress';
+   it.mailThread.push({direction:'in',day:state.day,body:'Dzień dobry, dziękuję za wiadomość. Mogę teraz sprawdzić problem. Jeśli potrzebne będą dodatkowe informacje, proszę dać znać.',unread:true});
+   logged(it,'Klient odpowiedział na e-mail – zgłoszenie wróciło do obsługi');
+   state.notifications.push({title:'Nowa odpowiedź od klienta',day:state.day,ticket:c.id});
   }else if(it.status==='resolved'&&it.resolvedDay&&state.day-Number(it.resolvedDay)>=2){
    it.status='closed';logged(it,'Automatyczne zamknięcie po okresie potwierdzenia – bez założenia, że brak odpowiedzi jest dowodem naprawy');
   }
@@ -440,7 +445,7 @@ else if(d.importClick)byId('importfile').click();
 else if(d.resetall){if(confirm('Czy na pewno usunąć WSZYSTKIE postępy? Tej operacji nie można cofnąć bez pliku eksportu.')){state=fresh();ensureItems();persist();render();toast('Symulator zresetowany.')}}
 });
 document.addEventListener('submit',ev=>{if(ev.target.id==='chatform'){ev.preventDefault();chatCustom(byId('chatinput').value)}if(ev.target.id==='cmdform'){ev.preventDefault();command(byId('cmdinput').value)}if(ev.target.id==='remotecmdform'){ev.preventDefault();command(byId('remotecmdinput').value)}if(ev.target.id==='mailform'){ev.preventDefault();sendMail()}});
-document.addEventListener('input',ev=>{if(ev.target.id==='notes')item().notes=ev.target.value;if(ev.target.id==='queue-search'){state.queueSearch=ev.target.value.slice(0,120);renderTicketList(cases())}});
+document.addEventListener('input',ev=>{if(ev.target.id==='notes')item().notes=ev.target.value;if(ev.target.id==='queue-search'){state.queueSearch=ev.target.value.slice(0,120);persist();renderTicketList(cases())}});
 document.addEventListener('change',ev=>{if(ev.target.id==='queue-status'){state.queueStatus=ev.target.value;persist();render()}if(ev.target.id==='queue-sort'){state.queueSort=ev.target.value;persist();render()}if(ev.target.id==='importfile'){importSave(ev.target.files[0]);ev.target.value=''}if(ev.target.id==='trainingmode'){state.training=ev.target.checked;persist();render()}if(ev.target.id==='autopause'){state.autoPause=ev.target.checked;state.clock.autoPaused=state.autoPause&&!document.hasFocus();state.clock.lastTick=Date.now();persist();refreshClock()}});
 document.addEventListener('visibilitychange',()=>setAutoPause(document.hidden));
 window.addEventListener('blur',()=>setAutoPause(true));
