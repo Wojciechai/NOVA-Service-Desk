@@ -21,7 +21,7 @@ The application runs locally **without installation, server, virtual machine, AP
 | Area | What you can practice |
 | --- | --- |
 | Ticket management | Dashboard, search/filter/sort, priorities, lifecycle status, case notes, verification and fictional SLA indicators |
-| NOVA Mail | Offline inbox/sent messages linked to cases, outgoing replies, scripted customer follow-ups and Rush Hour customer mail |
+| NOVA Mail | Offline inbox/sent messages linked to cases, outgoing replies, scripted follow-ups and Rush Hour emails; unsent drafts persist across new incidents |
 | Rush Hour | Approx. 25% chance per eligible day, multi-minute staggered arrival of 3–6 new tickets and 1–3 emails, two-day cooldown and shift summaries |
 | Escalations L1 → L2 | Team selection, mandatory diagnostic handoff, logged history and scripted next-day specialist response |
 | Device Manager | Fictional Windows device/driver inspection, stateful update, rollback or installation and two distinct authored cases |
@@ -53,7 +53,7 @@ The existing pause/Alt+Tab behavior also pauses arrivals. The end-of-shift repor
 
 - **INC-DRV-011 (day 2):** audio fails after a driver update. Inspect the fictional Device Manager, review the version, and **roll back** to the previously approved package; an inappropriate update makes things worse.
 - **INC-DRV-012 (day 4):** the Wi-Fi adapter has no installed driver, but Ethernet still works. Use Remote Assist, inspect the device, **install an approved driver**, and verify connectivity.
-- **L1 → L2 handoff:** choose IT Support L2, Network Team or Security Team, enter a meaningful diagnosis and business impact, and wait for a **scripted specialist response** on a subsequent simulated day. Sending a customer email does not cancel a pending escalation.
+- **L1 → L2 handoff:** choose IT Support L2, Network Team or Security Team, enter a meaningful diagnosis and business impact, and wait for a **scripted specialist response** on a subsequent simulated day. An unsent escalation note and selected team are preserved when new events arrive. Sending a customer email does not cancel a pending escalation.
 
 ### Scenarios and limitations
 
