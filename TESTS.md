@@ -79,6 +79,7 @@ node scripts/operations-checks.js NOVA_Service_Desk.html
 - [x] Approved Wi-Fi package installation fixed the new missing-driver case after diagnosis.
 - [x] Escalation with no diagnostic evidence was blocked; documented L1 → L2 handoff remained pending despite customer mail and returned with a scripted answer the following day.
 - [x] Controlled random draw created a Rush Hour schedule once, emitted **three tickets and one email** in stages, and did not change the event count during a manual pause.
+- [x] Unsent customer emails and escalation notes/team choices survived incoming Rush Hour events, browser reload and JSON backup import.
 - [x] Refresh restored active Rush Hour plans and all previously emitted tickets without duplication.
 - [x] JSON import restored Rush plans, generated incidents and notifications.
 - [x] Completed peak cases retained their data; all unresolved peak tickets carried to the next simulated shift.
