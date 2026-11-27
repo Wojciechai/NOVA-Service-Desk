@@ -4,6 +4,37 @@ All notable **application changes** are recorded here, with newest versions firs
 
 Dates refer to when the development versions were prepared. The v0.3.0, v0.4.0 and v0.5.0 entries describe actual development stages that were subsequently combined into the current v0.5.1 application; they are **not separate public GitHub releases**.
 
+## [0.7.0] — 2026-11-27 — Rush Hour & IT Operations
+
+### Added
+- **NOVA Rush Hour:** roughly 25% chance per eligible simulated workday (from day 3), with at least two ordinary shifts between actual peaks. A scheduled burst unfolds gradually during active clock time, introducing **3–6 additional tickets** and **1–3 incoming emails**.
+- **Persistent randomness:** the once-per-day roll, event order, timing and progress are saved; browser refresh and JSON import do not reroll a running burst or duplicate emitted tickets. Manual/automatic pause stops the arrival schedule.
+- **Incident grouping:** selected pairs of peak tickets carry a shared fictional incident-group identifier. This is a triage hint, not an automatic cross-ticket repair mechanism.
+- **Rush reporting:** shift summaries show the number of added tickets/emails, P1 requests left without initial checks and escalated peak tickets. Unfinished cases retain their progress across day rollover.
+- **Device Manager:** interactive fictional Windows device and driver properties, hardware warning codes, version inspection, rollback, approved installation, update and disabling actions with meaningful consequences.
+- **Two new authored cases:** `INC-DRV-011` (audio driver regression; approved rollback) on day 2 and `INC-DRV-012` (missing Wi-Fi driver; approved installation) on day 4. The original 12 authored case workflows remain available.
+- **L1 → L2 escalations:** tickets can be handed to IT Support L2, Network Team or Security Team with a mandatory technical summary, validation of critical security/network preconditions, an auditable history, a pending team status and scripted follow-up the next simulated day.
+- **Knowledge Base 2.0:** ten locally searchable Helpdesk procedures with category filtering and guidance linked to the currently selected ticket.
+- **Regressions and CI:** a new `scripts/v07-checks.js` suite and a GitHub Actions workflow configured to run all existing and new Node suites on pushes and pull requests.
+
+### Changed
+- Active team escalation is not confused with Resolved; outstanding escalations remain in the work backlog, and a client email does not overwrite the L2 handoff status.
+- Escalated tickets cannot be worked on or resolved by L1 before the scripted specialist response, and are excluded from the simplified training SLA-overdue calculation while pending.
+- Export filename and interface identify **v0.7.0**, while the existing `localStorage` key remains stable for v0.6 saves.
+- Existing save metadata upgrades to the current version on load.
+
+### Fixed
+- Corrected ID validation for persisted emergency/Rush tickets, preserving their canonical metadata across refresh and JSON import.
+- Initialized Rush template definitions before restoring saved in-progress events; this prevents an initialization error from discarding an active saved session.
+- Made the earlier clock/hotfix tests deterministic when a random Rush Hour would otherwise be capable of changing expected incident counts.
+- Corrected reported carried-over counts to exclude Resolved and Closed cases and prevented conflicting actions during pending escalations.
+
+### Verification and limits
+- V8 simulated-DOM execution of all **five regression suites** passed, including **12/12 original ticket workflows**, both new driver scenarios, an L1/L2 handoff, the Knowledge Base search, and a full Rush Hour with pause, refresh, JSON import, cooldown and rollover.
+- GitHub Actions workflow configuration was committed; an individual hosted CI run is **not independently confirmed** in these release notes.
+- This remains a curated **offline training simulator**. No real e-mail is sent and no real Windows driver or infrastructure is changed. Incoming events, responses and diagnoses use predefined scenarios, not an unconstrained AI system.
+- Real-browser UI/visual testing, accessibility, long-duration stability and integration testing remain outstanding.
+
 ## [0.6.0] — 2026-11-26 — Service Desk Operations (first iteration)
 
 ### Added
