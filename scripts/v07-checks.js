@@ -42,7 +42,8 @@ function base(day=1){
 }
 async function run(){
  // Core regression: all old incident solutions still award XP once.
- const original=harness({saved:base(10)});
+ const originalSave=base(10);originalSave.earned={'INC-D500':5000};
+ const original=harness({saved:originalSave});
  const actions={dns:['config','iptest','dnstest','repair','verify'],account:['identity','logs','repair','verify'],outlook:['web','offline','repair','verify'],printer:['printer','queue','repair','verify'],teams:['permissions','device','repair','verify'],dhcp:['config','gateway','repair','verify'],vpn:['impact','check','escalate','verify'],slow:['taskmgr','startup','repair','verify'],mailbox:['web','quota','repair','verify'],security:['stop','isolate','escalate','verify']};
  const cases=[['INC-1001','dns'],['INC-1002','account'],['INC-1003','outlook'],['INC-1004','printer'],['INC-1005','teams'],['INC-1006','dhcp'],['INC-1007','vpn'],['INC-1008','slow'],['INC-1009','mailbox'],['INC-1010','security'],['INC-1011','printer'],['INC-1012','teams']];
  for(const [id,type] of cases){
