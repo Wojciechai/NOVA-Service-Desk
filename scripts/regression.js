@@ -11,7 +11,8 @@ const item=id=>{if(!elements.has(id))elements.set(id,{innerHTML:'',value:'',text
 const document={hidden:false,getElementById:item,querySelector:()=>item('nav'),addEventListener:(event,cb)=>{callbacks[event]=cb},hasFocus:()=>true};
 const window={addEventListener:(event,cb)=>{wins[event]=cb}};
 const LocalDate=class extends Date{static now(){return n}};
-const context={document,window,Date:LocalDate,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},setInterval:cb=>{interval=cb},setTimeout:()=>1,clearTimeout(){},confirm:()=>true,console,Blob,URL,Math,Object,Number,String,Array,JSON,Map,Set,RegExp};
+const StableMath=Object.create(Math);StableMath.random=()=>.95;
+const context={document,window,Date:LocalDate,Math:StableMath,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},setInterval:cb=>{interval=cb},setTimeout:()=>1,clearTimeout(){},confirm:()=>true,console,Blob,URL,Math,Object,Number,String,Array,JSON,Map,Set,RegExp};
 vm.runInNewContext(code,context,{filename:'NOVA.js',timeout:2500});
 function state(){return JSON.parse(store.get('nova-helpdesk-v02'))}
 function click(dataset){callbacks.click({target:{closest:()=>({dataset})}})}
