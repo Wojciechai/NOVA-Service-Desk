@@ -21,11 +21,22 @@
 - [x] Non-blocking notifications for reopened tickets and customer replies
 - [x] Save/import/export of the new state and simulated workday continuity
 
+## Shipped in v0.7.0 — Rush Hour & IT Operations
+
+- [x] Randomized Rush Hour after day 2, roughly 25% per eligible shift, at least two non-peak shifts between triggered events
+- [x] Staggered 3–6 new authored-template tickets and 1–3 customer emails, with optional incident grouping
+- [x] Persisted one-time event rolls, pause-safe timing, duplicate protection, JSON migration and after-shift Rush metrics
+- [x] Interactive fictional Windows Device Manager, driver inspection, rollback, approved package installation and incorrect-action consequences
+- [x] Two new driver incidents: audio rollback and Wi-Fi driver installation
+- [x] L1 escalation to L2, Network and Security with required diagnostic evidence, stored handoff history and later scripted team reply
+- [x] Offline searchable Knowledge Base 2.0 with ten categorized procedures and case-relevant guidance
+- [x] New simulated-state regression suite and GitHub Actions workflow configuration
+
 ## Next lifecycle improvements — proposed, not yet implemented
 
 - [ ] Generalize real customer follow-ups, partial repairs, recurrences and reopening conditions to more scenario types rather than the single authored Outlook recurrence
 - [ ] Separate response-time and resolution-time SLA clocks with working-hours and waiting-state policy
-- [ ] Internal technician notes versus public customer replies, with meaningful assignment and L1/L2 escalation history
+- [ ] Distinguish internal technician notes from customer-visible correspondence and extend L1/L2 handoffs to multi-step ownership and reassignment (the initial team escalation/history workflow shipped in v0.7)
 - [ ] Explicit company policies for customer-confirmation windows and technically justified resolution
 - [ ] More realistic email scenarios and validation of communication quality, without pretending to have unrestricted AI
 - [ ] More extensive migration, abuse-case and real-browser interaction tests
@@ -33,12 +44,14 @@
 ## Next iterations
 
 - [ ] Richer customer dialogues and multi-step problem branches
-- [ ] Search, ticket filters and sorting for large backlogs
 - [ ] More simulated Windows applications and interlinked faults
-- [ ] Notification/interruptions with variable impact and task priority trade-offs
-- [ ] Enhanced knowledge base, troubleshooting explanations and case-specific hints
+- [ ] Expanded dynamic incident chains and realistic impact-based prioritization beyond authored Rush Hour templates
+- [ ] Knowledge Base article cross-links, guided troubleshooting branches, editorial review and stronger hints beyond the ten shipped local procedures
 - [ ] Strict backup schema validation, migration tests and stronger storage recovery
-- [ ] Real-browser E2E tests and automated CI once execution environment permits
+- [ ] Real-browser E2E tests, accessibility, long-duration stability and verified GitHub Actions execution (workflow configuration already exists)
+- [ ] Additional driver fault variants (graphics, audio services, networking) and device inventory history
+- [ ] **NOVA Infrastructure Monitor**: fictional network devices, DNS/DHCP/VPN health, basic server-room alarms and contextual links to ticket scenarios
+- [ ] **Windows Server Lab**: isolated virtual practice with AD, file sharing, DNS/DHCP and role-based admin actions (future optional learning mode)
 - [ ] Optional **Real Windows Lab** via isolated VM, separate from Simulation Mode; not included now
 
 The current application remains an offline training simulation. Features shown under Next iterations are proposals, not claims of delivered functionality.
