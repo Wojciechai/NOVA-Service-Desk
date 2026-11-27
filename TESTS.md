@@ -1,4 +1,4 @@
-# Verification report — NOVA Service Desk v0.5.1
+# Verification history — NOVA Service Desk
 
 Verification performed on **2026-11-25** in a sandboxed project runtime.
 
@@ -63,3 +63,38 @@ node scripts/operations-checks.js NOVA_Service_Desk.html
 ```
 
 **Still requires manual checking:** Chrome/Edge/Opera GX interactions, responsive layout, keyboard navigation, JSON file-picker import/export and full 24-minute real-time shifts. A simulated-DOM test alone cannot verify visual correctness.
+
+
+## v0.7.0 — Rush Hour & IT Operations (2026-11-27)
+
+**Scope:** app-script V8 execution using a simulated DOM, local storage, deterministic time and controlled random draws. This verifies state and scripted interface output, **not** real browser rendering, screen readers, user workflows or deployed CI results.
+
+- [x] Embedded application JavaScript parsed without syntax errors.
+- [x] Original **12/12** ticket workflows completed as before; XP was awarded with no extra duplicate resolutions.
+- [x] Existing regression suite passed remote assistance, DNS misconfiguration/recovery, pause, Alt+Tab behavior, day rollover, urgent interruptions and achievements.
+- [x] v0.5.1 targeted checks passed emergency-title normalization, mistaken VPN action recovery, delayed clock compensation and DNS restoration.
+- [x] v0.6.0 checks passed ticket search, NOVA Mail, technical-only resolution, Outlook recurrence, case reopening and XP preservation.
+- [x] Knowledge Base 2.0 responded to search terms and showed the matching driver article.
+- [x] Device Manager showed scripted states; inappropriate driver updates left audio broken and incurred a simulated penalty, while rollback solved the audio case.
+- [x] Approved Wi-Fi package installation fixed the new missing-driver case after diagnosis.
+- [x] Escalation with no diagnostic evidence was blocked; documented L1 → L2 handoff remained pending despite customer mail and returned with a scripted answer the following day.
+- [x] Controlled random draw created a Rush Hour schedule once, emitted **three tickets and one email** in stages, and did not change the event count during a manual pause.
+- [x] Refresh restored active Rush Hour plans and all previously emitted tickets without duplication.
+- [x] JSON import restored Rush plans, generated incidents and notifications.
+- [x] Completed peak cases retained their data; all unresolved peak tickets carried to the next simulated shift.
+- [x] Rush Hour shift-report metrics were shown in progress history, and the immediate following day correctly observed the cooldown.
+- [x] Previous emergency incident IDs imported correctly and an injected title was replaced with the canonical authored title.
+
+**Regression commands:**
+
+```bash
+node scripts/regression.js NOVA_Service_Desk.html
+node scripts/scenario-checks.js NOVA_Service_Desk.html
+node scripts/hotfix-checks.js NOVA_Service_Desk.html
+node scripts/operations-checks.js NOVA_Service_Desk.html
+node scripts/v07-checks.js NOVA_Service_Desk.html
+```
+
+A new `.github/workflows/ci.yml` runs these five suites on pushes and pull requests. **The hosted GitHub Actions outcome was not directly verified** at the time this report was written.
+
+**Manual checks still needed on the user's computer:** browser layout for Device Manager and Knowledge Base 2.0, correct handling of hardware-like controls, long active Rush Hours, keyboard navigation, export/import through the actual file picker, and a full 24-minute day without pauses. This application never accesses a real customer computer or modifies Windows drivers.
