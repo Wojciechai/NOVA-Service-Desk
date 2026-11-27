@@ -1,0 +1,32 @@
+name: NOVA regression tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline-simulator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check scripts/regression.js
+          node --check scripts/scenario-checks.js
+          node --check scripts/hotfix-checks.js
+          node --check scripts/operations-checks.js
+          node --check scripts/v07-checks.js
+      - name: Old state-machine checks
+        run: node scripts/regression.js NOVA_Service_Desk.html
+      - name: All original cases
+        run: node scripts/scenario-checks.js NOVA_Service_Desk.html
+      - name: v0.5.1 hotfix regression
+        run: node scripts/hotfix-checks.js NOVA_Service_Desk.html
+      - name: v0.6.0 service desk workflows
+        run: node scripts/operations-checks.js NOVA_Service_Desk.html
+      - name: v0.7.0 new workflows
+        run: node scripts/v07-checks.js NOVA_Service_Desk.html
