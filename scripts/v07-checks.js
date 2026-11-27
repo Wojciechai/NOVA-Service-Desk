@@ -115,13 +115,24 @@ async function run(){
  rush.tick(110000);
  assert.strictEqual(rush.state().rush.plan.events.length,4);
  const planned=JSON.stringify(rush.state().rush.plan.events);
+ const draftMail='Proszę o potwierdzenie, czy Outlook odbiera nowe wiadomości po uruchomieniu aplikacji.';
+ rush.click({page:'mail'});rush.click({mailTicket:'INC-1003'});rush.input('mail-reply',draftMail);
  rush.tick(110000);rush.tick(110000);
+ assert.strictEqual(rush.state().items['INC-1003'].mailDraft,draftMail);
+ assert(rush.el('mailpage').innerHTML.includes(draftMail),'Incoming incidents must not erase composed mail');
+ rush.click({ticket:'INC-1001'});rush.click({tab:'report'});
+ const draftEscalation='Zweryfikowano konfigurację sieci, potrzebne dalsze badanie usługi po stronie specjalistów.';
+ rush.input('escalation-reason',draftEscalation);
+ rush.handlers.change({target:{id:'escalation-team',value:'Network'}});
+
  rush.click({clockToggle:'1'});
  const beforePause=rush.state();
  rush.tick(110000);
  assert.strictEqual(rush.state().clock.remainingMs,beforePause.clock.remainingMs);
  assert.strictEqual(rush.state().rush.plan.next,beforePause.rush.plan.next);
  rush.click({clockToggle:'1'});rush.tick(110000);rush.tick(110000);
+ assert(rush.el('ticketdetail').innerHTML.includes(draftEscalation),'Incoming mail must preserve L2 handoff draft');
+ assert.strictEqual(rush.state().items['INC-1001'].escalationTeam,'Network');
  const burst=rush.state();
  assert.strictEqual(burst.rush.plan.tickets,3);
  assert.strictEqual(burst.rush.plan.emails,1);
@@ -131,6 +142,8 @@ async function run(){
  const restored=harness({storage:savedStore,random:.10,time:simTime});
  assert.strictEqual(restored.state().extraCases.length,count);
  assert.strictEqual(restored.state().rush.plan.next,burst.rush.plan.next);
+ assert.strictEqual(restored.state().items['INC-1003'].mailDraft,draftMail);
+ assert.strictEqual(restored.state().items['INC-1001'].escalationDraft,draftEscalation);
  restored.tick(100000);
  assert.strictEqual(restored.state().extraCases.length,count);
  const backup=restored.state();
@@ -138,6 +151,8 @@ async function run(){
  await imported.import(backup);
  assert.strictEqual(imported.state().extraCases.length,count);
  assert.strictEqual(imported.state().rush.plan.next,backup.rush.plan.next);
+ assert.strictEqual(imported.state().items['INC-1003'].mailDraft,draftMail);
+ assert.strictEqual(imported.state().items['INC-1001'].escalationDraft,draftEscalation);
  restored.click({nextday:'1'});
  assert.strictEqual(restored.state().shiftHistory.at(-1).rushTickets,3);
  assert.strictEqual(restored.state().shiftHistory.at(-1).rushEmails,1);
@@ -146,7 +161,7 @@ async function run(){
  assert(restored.el('progresspage').innerHTML.includes('Rush Hour'));
  restored.tick(1000);
  assert.strictEqual(restored.state().rush.plan,null,'Two day cooldown');
- console.log('PASS staged Rush Hour, pause, refresh, JSON import, carry-over, cooldown and shift report');
+ console.log('PASS staged Rush Hour, drafts, pause, refresh, JSON import, carry-over, cooldown and shift report');
  // Previous emergency IDs and sanitized titles still load.
  const old=base(3);old.extraCases=[{id:'INC-E003',day:3,type:'dns',title:'<script>Injected</script>'}];
  const migration=harness({saved:old});
