@@ -120,6 +120,7 @@ const DRIVER_CASES=[
  {id:'INC-DRV-011',day:2,type:'driver',user:'Julia Lewandowska',dept:'HR',device:'LAP-HR-014',title:'Brak dźwięku po aktualizacji Windows',priority:'P2',issue:'„Po aktualizacji Windows nie słychać dźwięku z głośników laptopa. Przed aktualizacją działało.”',details:'Wadliwy sterownik Audio Codec 3.0.8; ostatnia stabilna firmowa wersja to 2.9.4.',required:['hardware','version','fix','verify'],steps:{hardware:'Sprawdź urządzenie i kod błędu w Menedżerze urządzeń',version:'Porównaj wersję i historię sterownika',fix:'Przywróć ostatni działający sterownik audio',verify:'Wykonaj test odtwarzania dźwięku'},remote:true},
  {id:'INC-DRV-012',day:4,type:'driver-network',user:'Kamil Jankowski',dept:'Logistyka',device:'LAP-LOG-002',title:'Karta Wi-Fi nie działa — brak sterownika',priority:'P2',issue:'„Wi-Fi zniknęło z ustawień. Po kablu Ethernet komputer działa, ale Wi-Fi nie można włączyć.”',details:'Brak zatwierdzonego sterownika Wi-Fi, aktywny Ethernet pozwala na symulowaną pomoc zdalną.',required:['hardware','version','fix','verify'],steps:{hardware:'Sprawdź kartę Wi-Fi i kod błędu',version:'Sprawdź wersję i dostępność sterownika',fix:'Zainstaluj zatwierdzony sterownik firmowy',verify:'Potwierdź połączenie Wi-Fi po instalacji'},remote:true}
 ];
+const RUSH_TEMPLATES=['INC-1001','INC-1002','INC-1003','INC-1004','INC-1005','INC-1008','INC-DRV-011','INC-DRV-012'];
 const TEMPLATE_POOL=RAW.filter(c=>['dns','outlook','printer','teams','dhcp','slow','mailbox','account'].includes(c.type));
 const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const byId=id=>document.getElementById(id);
@@ -337,7 +338,6 @@ function createEmergency(){
  persist();render();toast('Pilne zgłoszenie '+c.id+'! Oceń wpływ i priorytet.');
 }
 
-const RUSH_TEMPLATES=['INC-1001','INC-1002','INC-1003','INC-1004','INC-1005','INC-1008','INC-DRV-011','INC-DRV-012'];
 function sanitizeRushState(value){
  const empty={checkedDay:0,lastRushDay:0,plan:null};
  if(!value||typeof value!=='object')return empty;
