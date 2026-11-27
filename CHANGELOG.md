@@ -24,6 +24,7 @@ Dates refer to when the development versions were prepared. The v0.3.0, v0.4.0 a
 - Existing save metadata upgrades to the current version on load.
 
 ### Fixed
+- Preserved unsent customer email drafts and L1-to-L2 handoff notes/team selection when Rush Hour events redraw the current workspace; retained these drafts in JSON backups.
 - Corrected ID validation for persisted emergency/Rush tickets, preserving their canonical metadata across refresh and JSON import.
 - Initialized Rush template definitions before restoring saved in-progress events; this prevents an initialization error from discarding an active saved session.
 - Made the earlier clock/hotfix tests deterministic when a random Rush Hour would otherwise be capable of changing expected incident counts.
